@@ -9,7 +9,7 @@ import java.time.LocalDate;
 
 @Data
 public class Film {
-    private int id;
+    private int id = 0;
     @NotNull
     @NotBlank
     private final String name;
