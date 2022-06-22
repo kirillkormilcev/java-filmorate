@@ -1,5 +1,6 @@
 package ru.yandex.practikum.filmorate.controller.film;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practikum.filmorate.model.film.Film;
 
@@ -10,7 +11,8 @@ import java.util.HashMap;
 import java.util.List;
 
 @RestController
-@RequestMapping("/film")
+@RequestMapping("/films")
+@Slf4j
 public class FilmController {
 
     private final HashMap<Integer, Film> films = new HashMap<>();

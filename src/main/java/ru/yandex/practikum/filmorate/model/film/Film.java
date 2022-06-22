@@ -1,6 +1,5 @@
 package ru.yandex.practikum.filmorate.model.film;
 
-
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
