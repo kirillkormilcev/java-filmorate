@@ -1,5 +1,6 @@
 package ru.yandex.practikum.filmorate.controller.film;
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practikum.filmorate.model.film.Film;
@@ -13,6 +14,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/films")
 @Slf4j
+@Getter
 public class FilmController {
 
     private final HashMap<Integer, Film> films = new HashMap<>();
@@ -34,7 +36,7 @@ public class FilmController {
     }
 
     @PutMapping
-    public Film updateFilm(@RequestBody Film film) {
+    public Film updateFilm(@Valid @RequestBody Film film) {
         if (filmValidation(film)) {
             films.put(film.getId(), film);
             log.info("Получен PUT запрос к эндпоинту: /films, успешно обработан.\n" +

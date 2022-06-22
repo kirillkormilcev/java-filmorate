@@ -34,7 +34,7 @@ public class UserController {
     }
 
     @PutMapping
-    public User updateUser(@RequestBody User user) {
+    public User updateUser(@Valid @RequestBody User user) {
         if (userValidation(user)) {
             users.put(user.getId(), user);
             log.info("Получен PUT запрос к эндпоинту: /users, успешно обработан.\n" +
