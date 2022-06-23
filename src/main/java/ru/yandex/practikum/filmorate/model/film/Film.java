@@ -8,6 +8,7 @@ import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.LocalDate;
 
+/** класс фильма */
 @Data
 @Builder
 public class Film implements Serializable {
