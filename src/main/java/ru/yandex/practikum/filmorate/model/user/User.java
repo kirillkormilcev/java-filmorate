@@ -7,13 +7,15 @@ import lombok.Data;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 import java.time.LocalDate;
 
 @Data
 @Builder
-public class User {
+public class User implements Serializable {
     private int id;
     @NotNull
+    @NotBlank
     @Email
     private final String email;
     @NotNull

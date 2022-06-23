@@ -1,10 +1,16 @@
 package ru.yandex.practikum.filmorate.controller.film;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
+import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
+import ru.yandex.practikum.filmorate.FilmorateApplication;
 import ru.yandex.practikum.filmorate.model.film.Film;
 
-import javax.validation.Valid;
 import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -18,6 +24,58 @@ class FilmControllerTest {
             .releaseDate(LocalDate.of(2009, 12, 10))
             .duration(78)
             .build();
+
+    RestTemplateBuilder restTemplateBuilder = new RestTemplateBuilder();
+    RestTemplate restTemplate = restTemplateBuilder.build();
+    String url = "http://localhost:8080/films";
+
+    @BeforeAll
+    static void start() {
+        String[] args = new String[0];
+        FilmorateApplication.main(args);
+    }
+
+    @AfterAll
+    static void stop() {
+        System.exit(0);
+    }
+
+    @Test
+    @DisplayName("Добавление фильма с пустым названием")
+    void addEmptyNameFilm() {
+        Film film1 = Film.builder()
+                .name("")
+                .description("Нео крут!")
+                .releaseDate(LocalDate.of(2009, 12, 10))
+                .duration(78)
+                .build();
+        HttpEntity<Film> entity = new HttpEntity<>(film1);
+        try {
+            ResponseEntity<Film> response = restTemplate.postForEntity(url, entity, Film.class);
+        } catch (HttpClientErrorException e) {
+            assertEquals(HttpStatus.BAD_REQUEST, e.getStatusCode(), "Неожиданный статус ответа");
+        }
+    }
+
+    @Test
+    @DisplayName("Обновление фильма с null названием")
+    void updateNullNameFilm() {
+        filmController.getFilms().clear();
+        filmController.addFilm(film);
+        Film film1 = Film.builder()
+                .id(film.getId())
+                .name(null)
+                .description("Нео крут!")
+                .releaseDate(LocalDate.of(2009, 12, 10))
+                .duration(78)
+                .build();
+        HttpEntity<Film> entity1 = new HttpEntity<>(film1);
+        try {
+            ResponseEntity<Film> response = restTemplate.exchange(url, HttpMethod.PUT, entity1, Film.class);
+        } catch (HttpClientErrorException e) {
+            assertEquals(HttpStatus.BAD_REQUEST, e.getStatusCode(), "Неожиданный статус ответа");
+        }
+    }
 
     @Test
     @DisplayName("Добавление фильма с существующим названием")
