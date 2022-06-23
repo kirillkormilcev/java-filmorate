@@ -29,17 +29,6 @@ class FilmControllerTest {
     RestTemplate restTemplate = restTemplateBuilder.build();
     String url = "http://localhost:8080/films";
 
-    @BeforeAll
-    static void start() {
-        String[] args = new String[0];
-        FilmorateApplication.main(args);
-    }
-
-    @AfterAll
-    static void stop() {
-        System.exit(0);
-    }
-
     @Test
     @DisplayName("Добавление фильма с пустым названием")
     void addEmptyNameFilm() {
