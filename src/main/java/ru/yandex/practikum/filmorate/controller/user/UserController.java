@@ -12,7 +12,9 @@ import java.time.LocalDate;
 @Slf4j
 public class UserController extends AbstractController<User> {
 
-    /** проверка полей добавляемого/обновляемого пользователя */
+    /**
+     * проверка полей добавляемого/обновляемого пользователя
+     */
     protected boolean dataValidation(User user) {
         if (user.getLogin().contains(" ")) {
             log.warn("Попытка добавить или обновить пользователя с логином: '{}', содержащего пробелы.", user.getLogin());

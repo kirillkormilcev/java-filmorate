@@ -10,12 +10,14 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 
-/** класс фильма */
+/**
+ * класс фильма
+ */
 @EqualsAndHashCode(callSuper = false)
 @Data
 @Builder
 public class Film extends AbstractDataUnit {
-    private int id = 0;
+    private int id;
     @NotNull
     @NotBlank
     private final String name;

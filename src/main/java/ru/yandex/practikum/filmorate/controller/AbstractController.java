@@ -11,7 +11,7 @@ import java.util.*;
 @RestController
 @Slf4j
 @Getter
-public abstract class AbstractController <T extends AbstractDataUnit>{
+public abstract class AbstractController<T extends AbstractDataUnit> {
 
     protected Map<Integer, T> storage = new LinkedHashMap<>();
     protected IdGenerator idGenerator = new IdGenerator();
@@ -27,7 +27,7 @@ public abstract class AbstractController <T extends AbstractDataUnit>{
             data.setId(idGenerator.getId());
             storage.put(data.getId(), data);
             log.info("Получен POST запрос к эндпоинту /{}s, успешно обработан.\n" +
-                    "В базу добавлен '{}': '{}' с id: '{}'.", data.getDataType().toString().toLowerCase(Locale.ROOT),
+                            "В базу добавлен '{}': '{}' с id: '{}'.", data.getDataType().toString().toLowerCase(Locale.ROOT),
                     data.getDataType(), data.getName(), data.getId());
         }
         return data;
@@ -38,7 +38,7 @@ public abstract class AbstractController <T extends AbstractDataUnit>{
         if (dataValidation(data)) {
             storage.put(data.getId(), data);
             log.info("Получен PUT запрос к эндпоинту: /{}s, успешно обработан.\n" +
-                    "В базе обновлен '{}': '{}' с id: '{}'.", data.getDataType().toString().toLowerCase(Locale.ROOT),
+                            "В базе обновлен '{}': '{}' с id: '{}'.", data.getDataType().toString().toLowerCase(Locale.ROOT),
                     data.getDataType(), data.getName(), data.getId());
         }
         return data;

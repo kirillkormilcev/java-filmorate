@@ -12,7 +12,9 @@ import java.time.LocalDate;
 @Slf4j
 public class FilmController extends AbstractController<Film> {
 
-    /** проверка полей добавляемого/обновляемого фильма */
+    /**
+     * проверка полей добавляемого/обновляемого фильма
+     */
     protected boolean dataValidation(Film film) {
         if (film.getDescription().length() > 200) {
             log.warn("Попытка добавить или обновить фильм: '{}' с описанием более 200 символов:\n'{}'.",
