@@ -3,28 +3,27 @@ package ru.yandex.practikum.filmorate.controller.film;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practikum.filmorate.controller.AbstractController;
 import ru.yandex.practikum.filmorate.model.film.Film;
 
-import javax.validation.Valid;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
 @RestController
 @RequestMapping("/films")
 @Slf4j
 @Getter
-public class FilmController {
+public class FilmController extends AbstractController<Film> {
 
-    private final HashMap<Integer, Film> films = new HashMap<>();
+    private final String uri = "/films";
 
-    @GetMapping
-    public List<Film> getAllFilms() {
-        return new ArrayList<>(films.values());
-    }
+    //private final HashMap<Integer, Film> films = new HashMap<>();
 
-    @PostMapping
+    //@GetMapping
+    //public List<Film> getAllFilms() {
+    //    return new ArrayList<>(films.values());
+    //}
+
+    /*@PostMapping
     public Film addFilm(@Valid @RequestBody Film film) {
         if (filmValidation(film)) {
             film.setId(FilmId.getId());
@@ -33,9 +32,9 @@ public class FilmController {
                             "В коллекцию добавлен фильм: '{}' с id: '{}'." , film.getName(), film.getId());
         }
         return film;
-    }
+    }*/
 
-    @PutMapping
+    /*@PutMapping
     public Film updateFilm(@Valid @RequestBody Film film) {
         if (filmValidation(film)) {
             films.put(film.getId(), film);
@@ -43,10 +42,10 @@ public class FilmController {
                     "В коллекции обновлен фильм: '{}' с id: '{}'." , film.getName(), film.getId());
         }
         return film;
-    }
+    }*/
 
     /** проверка полей добавляемого/обновляемого фильма */
-    private boolean filmValidation(Film film) {
+    protected boolean dataValidation(Film film) {
         if (film.getDescription().length() > 200) {
             log.warn("Попытка добавить или обновить фильм: '{}' с описанием более 200 символов:\n'{}'.",
                     film.getName(), film.getDescription());
@@ -63,13 +62,13 @@ public class FilmController {
             throw new FilmValidationException("Продолжительность фильма отрицательная.");
         }
         if (film.getId() != 0) {
-            if (!films.containsKey(film.getId())) {
+            if (!storage.containsKey(film.getId())) {
                 log.warn("Попытка обновить фильм: '{}' с индексом '{}', отсутствующим в базе.", film.getName(),
                         film.getId());
                 throw new FilmValidationException("Фильма с таким индексом нет в базе.");
             }
         }
-        for (Film filmAvailable : films.values()) {
+        for (Film filmAvailable : storage.values()) {
             if (film.getName().equals(filmAvailable.getName())) {
                 if (filmAvailable.getId() == film.getId()) {
                     return true;

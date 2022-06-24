@@ -49,8 +49,8 @@ class FilmControllerTest {
     @Test
     @DisplayName("Обновление фильма с null названием")
     void updateNullNameFilm() {
-        filmController.getFilms().clear();
-        filmController.addFilm(film);
+        filmController.getStorage().clear();
+        filmController.addData(film);
         Film film1 = Film.builder()
                 .id(film.getId())
                 .name(null)
@@ -69,7 +69,7 @@ class FilmControllerTest {
     @Test
     @DisplayName("Добавление фильма с существующим названием")
     void addExistingNameFilm() {
-        filmController.addFilm(film);
+        filmController.addData(film);
         Film film1 = Film.builder()
                 .name("Матрица")
                 .description("Нео крут!")
@@ -77,7 +77,7 @@ class FilmControllerTest {
                 .duration(78)
                 .build();
         try {
-            filmController.updateFilm(film1);
+            filmController.updateData(film1);
         } catch (FilmValidationException e) {
             assertEquals(FilmValidationException.class, e.getClass(), "При добавлении фильма не выброшено исключение.");
             assertEquals("Фильм с таким названием уже есть в базе.", e.getMessage(),
@@ -99,7 +99,7 @@ class FilmControllerTest {
                 .duration(78)
                 .build();
         try {
-            filmController.addFilm(film);
+            filmController.addData(film);
         } catch (FilmValidationException e) {
             assertEquals(FilmValidationException.class, e.getClass(), "При добавлении фильма не выброшено исключение.");
             assertEquals("Описание фильма содержит более 200 символов.", e.getMessage(),
@@ -117,7 +117,7 @@ class FilmControllerTest {
                 .duration(78)
                 .build();
         try {
-            filmController.addFilm(film);
+            filmController.addData(film);
         } catch (FilmValidationException e) {
             assertEquals(FilmValidationException.class, e.getClass(), "При добавлении фильма не выброшено исключение.");
             assertEquals("Дата релиза фильма ранее 28 декабря 1895 года.", e.getMessage(),
@@ -135,7 +135,7 @@ class FilmControllerTest {
                 .duration(-78)
                 .build();
         try {
-            filmController.addFilm(film);
+            filmController.addData(film);
         } catch (FilmValidationException e) {
             assertEquals(FilmValidationException.class, e.getClass(), "При добавлении фильма не выброшено исключение.");
             assertEquals("Продолжительность фильма отрицательная.", e.getMessage(),
@@ -146,7 +146,7 @@ class FilmControllerTest {
     @Test
     @DisplayName("Обновление фильма с несуществующим id")
     void updateNotExistingIdFilm() {
-        filmController.addFilm(film);
+        filmController.addData(film);
         Film film1 = Film.builder()
                 .id(10)
                 .name("Матрица обновлена")
@@ -155,7 +155,7 @@ class FilmControllerTest {
                 .duration(78)
                 .build();
         try {
-            filmController.addFilm(film1);
+            filmController.addData(film1);
         } catch (FilmValidationException e) {
             assertEquals(FilmValidationException.class, e.getClass(), "При добавлении фильма не выброшено исключение.");
             assertEquals("Фильма с таким индексом нет в базе.", e.getMessage(),

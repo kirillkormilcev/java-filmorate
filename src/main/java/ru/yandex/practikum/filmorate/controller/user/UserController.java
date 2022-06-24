@@ -2,27 +2,26 @@ package ru.yandex.practikum.filmorate.controller.user;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practikum.filmorate.controller.AbstractController;
 import ru.yandex.practikum.filmorate.model.user.User;
 
-import javax.validation.Valid;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
 @RestController
 @RequestMapping("/users")
 @Slf4j
-public class UserController {
+public class UserController extends AbstractController<User> {
 
-    private final HashMap<Integer, User> users = new HashMap<>();
+    private final String uri = "/users";
 
-    @GetMapping
-    public List<User> getAllUsers() {
-        return new ArrayList<>(users.values());
-    }
+    //private final HashMap<Integer, User> users = new HashMap<>();
 
-    @PostMapping
+    //@GetMapping
+    //public List<User> getAllUsers() {
+    //    return new ArrayList<>(users.values());
+    //}
+
+    /*@PostMapping
     public User addUser(@Valid @RequestBody User user) {
         if (userValidation(user)) {
             user.setId(UserId.getId());
@@ -31,20 +30,20 @@ public class UserController {
                     "В базу добавлен пользователь: '{}' с id: '{}'." , user.getLogin(), user.getId());
         }
         return user;
-    }
+    }*/
 
-    @PutMapping
-    public User updateUser(@Valid @RequestBody User user) {
-        if (userValidation(user)) {
-            users.put(user.getId(), user);
+    /*@PutMapping
+    public User updateUser(@Valid @RequestBody User data) {
+        if (userValidation(data)) {
+            users.put(data.getId(), data);
             log.info("Получен PUT запрос к эндпоинту: /users, успешно обработан.\n" +
-                    "В базе обновлен пользователь: '{}' с id: '{}'." , user.getLogin(), user.getId());
+                    "В базе обновлен пользователь: '{}' с id: '{}'." , data.getLogin(), data.getId());
         }
-        return user;
-    }
+        return data;
+    }*/
 
     /** проверка полей добавляемого/обновляемого пользователя */
-    private boolean userValidation(User user) {
+    protected boolean dataValidation(User user) {
         if (user.getLogin().contains(" ")) {
             log.warn("Попытка добавить или обновить пользователя с логином: '{}', содержащего пробелы.", user.getLogin());
             throw new UserValidationException("В логине присутствуют пробелы.");
@@ -58,7 +57,7 @@ public class UserController {
                     user.getLogin(), user.getBirthday());
             throw new UserValidationException("Не корректная дата рождения.");
         }
-        for (User userAvailable : users.values()) {
+        for (User userAvailable : storage.values()) {
             if (user.getEmail().equals(userAvailable.getEmail())) {
                 if (userAvailable.getId() == user.getId()) {
                     return true;

@@ -69,7 +69,7 @@ class UserControllerTest {
     @Test
     @DisplayName("Обновление пользователя с не корректным email")
     void updateIncorrectEmailUser() {
-        userController.addUser(user);
+        userController.addData(user);
         User user1 = User.builder()
                 .id(user.getId())
                 .email("hfgkj.uyy@")
@@ -105,7 +105,7 @@ class UserControllerTest {
     @Test
     @DisplayName("Обновление пользователя с пустым логином")
     void updateBlankLoginUser() {
-        userController.addUser(user);
+        userController.addData(user);
         User user1 = User.builder()
                 .id(user.getId())
                 .email("kirill@kormilcev.ru")
@@ -131,7 +131,7 @@ class UserControllerTest {
                 .birthday(LocalDate.of(1982,2,4))
                 .build();
         try {
-            userController.addUser(user);
+            userController.addData(user);
         } catch (UserValidationException e) {
             assertEquals(UserValidationException.class, e.getClass(), "При добавлении пользователя" +
                     " не выброшено исключение.");
@@ -150,7 +150,7 @@ class UserControllerTest {
                 .birthday(LocalDate.of(1982,2,4))
                 .build();
         try {
-            userController.addUser(user);
+            userController.addData(user);
         } catch (UserValidationException e) {
             assertEquals(user.getLogin(), user.getName(), "При добавлении пользователя без имени не подставлен логин");
         }
@@ -166,7 +166,7 @@ class UserControllerTest {
                 .birthday(LocalDate.now().plusDays(1))
                 .build();
         try {
-            userController.addUser(user);
+            userController.addData(user);
         } catch (UserValidationException e) {
             assertEquals(UserValidationException.class, e.getClass(), "При добавлении пользователя" +
                     " не выброшено исключение.");
@@ -178,7 +178,7 @@ class UserControllerTest {
     @Test
     @DisplayName("Обновление пользователя с почтой уже имеющейся в базе")
     void updateExistingEmailUser() {
-        userController.addUser(user);
+        userController.addData(user);
         User user1 = User.builder()
                 .id(user.getId())
                 .email("kirill@yandex.ru")
@@ -186,7 +186,7 @@ class UserControllerTest {
                 .name("Кирилл")
                 .birthday(LocalDate.now().minusDays(1))
                 .build();
-        userController.addUser(user1);
+        userController.addData(user1);
         User user2 = User.builder()
                 .id(user.getId())
                 .email("kirill@yandex.ru")
@@ -195,7 +195,7 @@ class UserControllerTest {
                 .birthday(LocalDate.now().minusDays(1))
                 .build();
         try {
-            userController.updateUser(user2);
+            userController.updateData(user2);
         } catch (UserValidationException e) {
             assertEquals(UserValidationException.class, e.getClass(), "При добавлении пользователя" +
                     " не выброшено исключение.");
