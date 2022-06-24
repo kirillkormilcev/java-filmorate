@@ -1,6 +1,5 @@
 package ru.yandex.practikum.filmorate.controller.film;
 
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practikum.filmorate.controller.AbstractController;
@@ -11,38 +10,7 @@ import java.time.LocalDate;
 @RestController
 @RequestMapping("/films")
 @Slf4j
-@Getter
 public class FilmController extends AbstractController<Film> {
-
-    private final String uri = "/films";
-
-    //private final HashMap<Integer, Film> films = new HashMap<>();
-
-    //@GetMapping
-    //public List<Film> getAllFilms() {
-    //    return new ArrayList<>(films.values());
-    //}
-
-    /*@PostMapping
-    public Film addFilm(@Valid @RequestBody Film film) {
-        if (filmValidation(film)) {
-            film.setId(FilmId.getId());
-            films.put(film.getId(), film);
-            log.info("Получен POST запрос к эндпоинту: /films, успешно обработан.\n" +
-                            "В коллекцию добавлен фильм: '{}' с id: '{}'." , film.getName(), film.getId());
-        }
-        return film;
-    }*/
-
-    /*@PutMapping
-    public Film updateFilm(@Valid @RequestBody Film film) {
-        if (filmValidation(film)) {
-            films.put(film.getId(), film);
-            log.info("Получен PUT запрос к эндпоинту: /films, успешно обработан.\n" +
-                    "В коллекции обновлен фильм: '{}' с id: '{}'." , film.getName(), film.getId());
-        }
-        return film;
-    }*/
 
     /** проверка полей добавляемого/обновляемого фильма */
     protected boolean dataValidation(Film film) {

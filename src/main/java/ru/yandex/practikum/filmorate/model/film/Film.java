@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import ru.yandex.practikum.filmorate.model.AbstractDataUnit;
+import ru.yandex.practikum.filmorate.model.DataType;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -14,7 +15,6 @@ import java.time.LocalDate;
 @Data
 @Builder
 public class Film extends AbstractDataUnit {
-    @Builder.Default
     private int id = 0;
     @NotNull
     @NotBlank
@@ -22,6 +22,5 @@ public class Film extends AbstractDataUnit {
     private final String description;
     private final LocalDate releaseDate;
     private final int duration;
-    @Builder.Default
-    private final String dataType = "Film";
+    private final DataType dataType = DataType.FILM;
 }

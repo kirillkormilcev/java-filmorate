@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import ru.yandex.practikum.filmorate.model.AbstractDataUnit;
+import ru.yandex.practikum.filmorate.model.DataType;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -16,7 +17,7 @@ import java.time.LocalDate;
 @Data
 @Builder
 public class User extends AbstractDataUnit {
-    private int id;
+    private int id = 0;
     @NotNull
     @NotBlank
     @Email
@@ -26,6 +27,5 @@ public class User extends AbstractDataUnit {
     private final String login;
     private String name;
     private LocalDate birthday;
-    @Builder.Default
-    private final String dataType = "User";
+    private final DataType dataType = DataType.USER;
 }

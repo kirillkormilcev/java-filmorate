@@ -14,11 +14,10 @@ import java.util.*;
 public abstract class AbstractController <T extends AbstractDataUnit>{
 
     protected Map<Integer, T> storage = new LinkedHashMap<>();
-    protected String uri = "";
     protected IdGenerator idGenerator = new IdGenerator();
 
     @GetMapping
-    public List<T> getAll() {
+    public List<T> getAllData() {
         return new ArrayList<>(storage.values());
     }
 
@@ -27,8 +26,9 @@ public abstract class AbstractController <T extends AbstractDataUnit>{
         if (dataValidation(data)) {
             data.setId(idGenerator.getId());
             storage.put(data.getId(), data);
-            log.info("Получен POST запрос к эндпоинту '{}', успешно обработан.\n" +
-                    "В базу добавлен пользователь: '{}' с id: '{}'.", uri, data.getLogin(), data.getId());
+            log.info("Получен POST запрос к эндпоинту /{}s, успешно обработан.\n" +
+                    "В базу добавлен '{}': '{}' с id: '{}'.", data.getDataType().toString().toLowerCase(Locale.ROOT),
+                    data.getDataType(), data.getName(), data.getId());
         }
         return data;
     }
@@ -37,8 +37,9 @@ public abstract class AbstractController <T extends AbstractDataUnit>{
     public T updateData(@Valid @RequestBody T data) {
         if (dataValidation(data)) {
             storage.put(data.getId(), data);
-            log.info("Получен PUT запрос к эндпоинту: '{}', успешно обработан.\n" +
-                    "В базе обновлен пользователь: '{}' с id: '{}'.", uri, data.getLogin(), data.getId());
+            log.info("Получен PUT запрос к эндпоинту: /{}s, успешно обработан.\n" +
+                    "В базе обновлен '{}': '{}' с id: '{}'.", data.getDataType().toString().toLowerCase(Locale.ROOT),
+                    data.getDataType(), data.getName(), data.getId());
         }
         return data;
     }

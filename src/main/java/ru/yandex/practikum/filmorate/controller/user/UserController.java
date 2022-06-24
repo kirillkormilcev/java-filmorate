@@ -12,36 +12,6 @@ import java.time.LocalDate;
 @Slf4j
 public class UserController extends AbstractController<User> {
 
-    private final String uri = "/users";
-
-    //private final HashMap<Integer, User> users = new HashMap<>();
-
-    //@GetMapping
-    //public List<User> getAllUsers() {
-    //    return new ArrayList<>(users.values());
-    //}
-
-    /*@PostMapping
-    public User addUser(@Valid @RequestBody User user) {
-        if (userValidation(user)) {
-            user.setId(UserId.getId());
-            users.put(user.getId(), user);
-            log.info("Получен POST запрос к эндпоинту: /users, успешно обработан.\n" +
-                    "В базу добавлен пользователь: '{}' с id: '{}'." , user.getLogin(), user.getId());
-        }
-        return user;
-    }*/
-
-    /*@PutMapping
-    public User updateUser(@Valid @RequestBody User data) {
-        if (userValidation(data)) {
-            users.put(data.getId(), data);
-            log.info("Получен PUT запрос к эндпоинту: /users, успешно обработан.\n" +
-                    "В базе обновлен пользователь: '{}' с id: '{}'." , data.getLogin(), data.getId());
-        }
-        return data;
-    }*/
-
     /** проверка полей добавляемого/обновляемого пользователя */
     protected boolean dataValidation(User user) {
         if (user.getLogin().contains(" ")) {
