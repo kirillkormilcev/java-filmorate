@@ -3,7 +3,6 @@ package ru.yandex.practikum.filmorate.model.user;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import ru.yandex.practikum.filmorate.model.AbstractDataUnit;
 import ru.yandex.practikum.filmorate.model.DataType;
 
 import javax.validation.constraints.Email;
@@ -14,11 +13,11 @@ import java.time.LocalDate;
 /**
  * класс пользователя
  */
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(of="id")
 @Data
 @Builder
-public class User extends AbstractDataUnit {
-    private int id;
+public class User {
+    private long id;
     @NotNull
     @NotBlank
     @Email
@@ -29,4 +28,5 @@ public class User extends AbstractDataUnit {
     private String name;
     private LocalDate birthday;
     private final DataType dataType = DataType.USER;
+    private long friendsCount;
 }

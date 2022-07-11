@@ -3,7 +3,6 @@ package ru.yandex.practikum.filmorate.model.film;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import ru.yandex.practikum.filmorate.model.AbstractDataUnit;
 import ru.yandex.practikum.filmorate.model.DataType;
 
 import javax.validation.constraints.NotBlank;
@@ -13,11 +12,11 @@ import java.time.LocalDate;
 /**
  * класс фильма
  */
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(of="id")
 @Data
 @Builder
-public class Film extends AbstractDataUnit {
-    private int id;
+public class Film {
+    private long id;
     @NotNull
     @NotBlank
     private final String name;
@@ -25,4 +24,5 @@ public class Film extends AbstractDataUnit {
     private final LocalDate releaseDate;
     private final int duration;
     private final DataType dataType = DataType.FILM;
+    private long likesCount;
 }
