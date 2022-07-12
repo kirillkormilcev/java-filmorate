@@ -10,6 +10,7 @@ import ru.yandex.practikum.filmorate.model.user.User;
 import ru.yandex.practikum.filmorate.storage.UserStorage;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -49,6 +50,33 @@ public class UserService {
         }
     }
 
+    public ResponseEntity addFriendToUser (long userId, long friendId) {
+        //TODO check, throw
+        getUserById(userId).getFriendIds().add(friendId);
+        getUserById(friendId).getFriendIds().add(userId);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    public ResponseEntity removeFriendFromUser (long userId, long friendId) {
+        //TODO check, throw
+        getUserById(userId).getFriendIds().remove(friendId);
+        getUserById(friendId).getFriendIds().remove(userId);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    public ResponseEntity<List<User>> getFriendsByUserId (long userId) {
+        List<User> friends = new ArrayList<>();
+        for (Long friendId: getUserById(userId).getFriendIds()) {
+            friends.add(getUserById(userId));
+        }
+        return new ResponseEntity<>(friends, HttpStatus.OK);
+    }
+
+    public User getUserById (Long userId) {
+        //TODO check
+        return userStorage.getUsers().get(userId);
+    }
+
     private boolean userValidation(User user) {
         if (user.getLogin().contains(" ")) {
             log.warn("Попытка добавить или обновить пользователя с логином: '{}', содержащего пробелы.", user.getLogin());
@@ -76,4 +104,5 @@ public class UserService {
         }
         return true;
     }
+
 }

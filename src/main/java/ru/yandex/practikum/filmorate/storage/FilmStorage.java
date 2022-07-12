@@ -9,7 +9,7 @@ import java.util.Map;
 
 @Component
 public interface FilmStorage {
-    Map<Integer, Film> films = new LinkedHashMap<>();
+    Map<Long, Film> films = new LinkedHashMap<>();
     IdGenerator idGenerator = new IdGenerator();
 
     /** список всех фильмов */
@@ -22,6 +22,6 @@ public interface FilmStorage {
     Film updateFilm(Film film);
 
     /** геттер мапы фильмов*/
-    Map<Integer, Film> getFilms();
+    Map<Long, Film> getFilms();
 }
 

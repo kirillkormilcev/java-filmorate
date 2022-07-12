@@ -11,7 +11,7 @@ import java.util.*;
 @Slf4j
 @Getter
 public class InMemoryUserStorage implements UserStorage{
-    private final Map<Integer, User> users = new LinkedHashMap<>();
+    private final Map<Long, User> users = new LinkedHashMap<>();
     private final IdGenerator idGenerator = new IdGenerator();
 
     @Override

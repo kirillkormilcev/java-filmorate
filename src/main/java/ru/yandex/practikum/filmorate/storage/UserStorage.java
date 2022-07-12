@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface UserStorage {
-    Map<Integer, User> users = new LinkedHashMap<>();
+    Map<Long, User> users = new LinkedHashMap<>();
     IdGenerator idGenerator = new IdGenerator();
 
     /** список всех фильмов */
@@ -21,6 +21,6 @@ public interface UserStorage {
     User updateUser(User user);
 
     /** геттер мапы пользователей*/
-    Map<Integer, User> getUsers();
+    Map<Long, User> getUsers();
 }
 

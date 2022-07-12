@@ -3,6 +3,7 @@ package ru.yandex.practikum.filmorate.model.film;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import ru.yandex.practikum.filmorate.model.DataType;
 
 import javax.validation.constraints.NotBlank;
@@ -12,11 +13,11 @@ import java.time.LocalDate;
 /**
  * класс фильма
  */
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode
 @Data
 @Builder
 public class Film{
-    private int id;
+    private long id;
     @NotNull
     @NotBlank
     private final String name;

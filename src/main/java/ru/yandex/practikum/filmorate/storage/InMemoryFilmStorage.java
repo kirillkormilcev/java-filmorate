@@ -11,7 +11,7 @@ import java.util.*;
 @Slf4j
 @Getter
 public class InMemoryFilmStorage implements FilmStorage{
-    private final Map<Integer, Film> films = new LinkedHashMap<>();
+    private final Map<Long, Film> films = new LinkedHashMap<>();
     private final IdGenerator idGenerator = new IdGenerator();
 
     @Override
