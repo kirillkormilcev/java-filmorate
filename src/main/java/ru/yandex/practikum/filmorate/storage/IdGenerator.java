@@ -1,4 +1,4 @@
-package ru.yandex.practikum.filmorate.controller;
+package ru.yandex.practikum.filmorate.storage;
 
 import lombok.Setter;
 

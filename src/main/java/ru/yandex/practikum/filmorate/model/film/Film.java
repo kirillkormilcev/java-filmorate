@@ -3,7 +3,6 @@ package ru.yandex.practikum.filmorate.model.film;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import ru.yandex.practikum.filmorate.model.AbstractDataUnit;
 import ru.yandex.practikum.filmorate.model.DataType;
 
 import javax.validation.constraints.NotBlank;
@@ -16,7 +15,7 @@ import java.time.LocalDate;
 @EqualsAndHashCode(callSuper = false)
 @Data
 @Builder
-public class Film extends AbstractDataUnit {
+public class Film{
     private int id;
     @NotNull
     @NotBlank

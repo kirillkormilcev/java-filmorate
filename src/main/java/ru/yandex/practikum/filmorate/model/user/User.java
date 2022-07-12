@@ -3,7 +3,6 @@ package ru.yandex.practikum.filmorate.model.user;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import ru.yandex.practikum.filmorate.model.AbstractDataUnit;
 import ru.yandex.practikum.filmorate.model.DataType;
 
 import javax.validation.constraints.Email;
@@ -17,7 +16,7 @@ import java.time.LocalDate;
 @EqualsAndHashCode(callSuper = false)
 @Data
 @Builder
-public class User extends AbstractDataUnit {
+public class User{
     private int id;
     @NotNull
     @NotBlank
