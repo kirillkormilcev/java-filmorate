@@ -31,6 +31,5 @@ public class User{
     private String name;
     private LocalDate birthday;
     private final DataType dataType = DataType.USER;
-    @JsonIgnore
-    private final Set<Long> friendIds = new HashSet<>();
+    private long friendsCount;
 }

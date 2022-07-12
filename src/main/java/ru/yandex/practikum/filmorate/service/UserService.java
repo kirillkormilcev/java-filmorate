@@ -53,15 +53,19 @@ public class UserService {
 
     public ResponseEntity<HttpStatus> addFriendToUser (long userId, long friendId) {
         //TODO check, throw
-        userStorage.addFriend(userId, friendId);
-        userStorage.addFriend(friendId, userId);
+        userStorage.addFriend(userId, friendId); /* добавить друга пользователю */
+        userStorage.addFriend(friendId, userId); /* добавить пользователя другу */
+        getUserById(userId).setFriendsCount(userStorage.getUserFriendIdsMap().get(userId).size());
+        /* обновить количество друзей */
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     public ResponseEntity<HttpStatus> removeFriendFromUser (long userId, long friendId) {
         //TODO check, throw
-        userStorage.removeFriend(userId, friendId);
-        userStorage.removeFriend(friendId, userId);
+        userStorage.removeFriend(userId, friendId); /* удалить друга у пользователя */
+        userStorage.removeFriend(friendId, userId); /* удалить пользователя у друга */
+        getUserById(userId).setFriendsCount(userStorage.getUserFriendIdsMap().get(userId).size());
+        /* обновить количество друзей */
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

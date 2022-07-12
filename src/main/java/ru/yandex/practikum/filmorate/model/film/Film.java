@@ -3,7 +3,6 @@ package ru.yandex.practikum.filmorate.model.film;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
 import ru.yandex.practikum.filmorate.model.DataType;
 
 import javax.validation.constraints.NotBlank;
@@ -25,4 +24,5 @@ public class Film{
     private final LocalDate releaseDate;
     private final int duration;
     private final DataType dataType = DataType.FILM;
+    private long likesCount;
 }
