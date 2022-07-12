@@ -12,6 +12,7 @@ import ru.yandex.practikum.filmorate.storage.UserStorage;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 
 @Service
@@ -25,7 +26,7 @@ public class UserService {
     }
 
     public ResponseEntity<List<User>> getAllUsersFromStorage() {
-        if (userStorage.getUsers().isEmpty()) {
+        if (userStorage.getUserMap().isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } else {
             return new ResponseEntity<>(userStorage.getListOfUsers(), HttpStatus.OK);
@@ -50,31 +51,28 @@ public class UserService {
         }
     }
 
-    public ResponseEntity addFriendToUser (long userId, long friendId) {
+    public ResponseEntity<HttpStatus> addFriendToUser (long userId, long friendId) {
         //TODO check, throw
-        getUserById(userId).getFriendIds().add(friendId);
-        getUserById(friendId).getFriendIds().add(userId);
+        userStorage.addFriend(userId, friendId);
+        userStorage.addFriend(friendId, userId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    public ResponseEntity removeFriendFromUser (long userId, long friendId) {
+    public ResponseEntity<HttpStatus> removeFriendFromUser (long userId, long friendId) {
         //TODO check, throw
-        getUserById(userId).getFriendIds().remove(friendId);
-        getUserById(friendId).getFriendIds().remove(userId);
+        userStorage.removeFriend(userId, friendId);
+        userStorage.removeFriend(friendId, userId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    public ResponseEntity<List<User>> getFriendsByUserId (long userId) {
-        List<User> friends = new ArrayList<>();
-        for (Long friendId: getUserById(userId).getFriendIds()) {
-            friends.add(getUserById(userId));
-        }
-        return new ResponseEntity<>(friends, HttpStatus.OK);
+    public ResponseEntity<Set<User>> getFriendsByUserId (long userId) {
+        //TODO check, throw
+        return new ResponseEntity<>(userStorage.getUserFriendIdsMap().get(userId), HttpStatus.OK);
     }
 
     public User getUserById (Long userId) {
-        //TODO check
-        return userStorage.getUsers().get(userId);
+        //TODO check, throw
+        return userStorage.getUserMap().get(userId);
     }
 
     private boolean userValidation(User user) {
@@ -91,7 +89,7 @@ public class UserService {
                     user.getLogin(), user.getBirthday());
             throw new UserValidationException("Не корректная дата рождения.");
         }
-        for (User userAvailable : userStorage.getUsers().values()) {
+        for (User userAvailable : userStorage.getUserMap().values()) {
             if (user.getEmail().equals(userAvailable.getEmail())) {
                 if (userAvailable.getId() == user.getId()) {
                     return true;
