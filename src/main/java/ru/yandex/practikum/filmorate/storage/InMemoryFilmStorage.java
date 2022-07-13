@@ -11,18 +11,19 @@ import java.util.*;
 @Component
 @Getter
 public class InMemoryFilmStorage implements FilmStorage {
-    private final Map<Long, Film> filmMap = new LinkedHashMap<>();
-    Comparator<Film> comparatorSortByLikeCount = (o1, o2) -> {
+    private final Map<Long, Film> filmMap = new LinkedHashMap<>(); /* мапа фильмов */
+    Comparator<Film> comparatorSortByLikeCount = (o1, o2) -> { /* компаратор сортировки по количеству лайков */
         if (o2.getLikesCount() > o1.getLikesCount()) {
             return 1;
         } else if (o2.getLikesCount() < o1.getLikesCount()) {
             return -1;
         } else {
-            return (int) (o2.getId() - o1.getId());
+            return (int) (o2.getId() - o1.getId()); /* при равных лайках по id */
         }
     };
     private final SortedSet<Film> sortedByLikeCountFilmSet = new TreeSet<>(comparatorSortByLikeCount);
-    private final Map<Long, Set<User>> likeIdsMap = new HashMap<>();
+    /* множество фильмов, сортированных по количеству лайков */
+    private final Map<Long, Set<User>> likeIdsMap = new HashMap<>(); /* мапа множеств лайкнувших пользователей */
     private final IdGenerator idGenerator = new IdGenerator();
     private final UserStorage userStorage;
 
@@ -49,13 +50,16 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public Film updateFilm(Film film) {
         filmMap.put(film.getId(), film);
+        if (film.getLikesCount() > 0) { /* TODO надо ли? может прилететь на обновление фильм с измененным количеством лайков */
+            sortedByLikeCountFilmSet.add(film);
+        }
         return film;
     }
 
     @Override
     public void addLikeUserToFilm(long filmId, long userId) {
-        if (!likeIdsMap.containsKey(filmId)) {
-            likeIdsMap.put(filmId, new HashSet<>());
+        if (!likeIdsMap.containsKey(filmId)) { /* если множество лайкнувших пользователей еще не создано */
+            likeIdsMap.put(filmId, new HashSet<>()); /* то создаем */
         }
         likeIdsMap.get(filmId).add(userStorage.getUserMap().get(userId));
     }
@@ -66,7 +70,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public void addOrRemoveFilmToSortedByLikesSet(Film film) {
+    public void updateFilmInSortedByLikesSet(Film film) {
         if (film.getLikesCount() > 0) {
             sortedByLikeCountFilmSet.add(film);
         } else {

@@ -4,7 +4,6 @@ import lombok.Setter;
 
 @Setter
 public class IdGenerator {
-
     private long id = 1L;
 
     protected IdGenerator() {

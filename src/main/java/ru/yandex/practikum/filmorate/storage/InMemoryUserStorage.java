@@ -10,9 +10,9 @@ import java.util.*;
 @Component
 @Getter
 public class InMemoryUserStorage implements UserStorage {
-    private final Map<Long, User> userMap = new LinkedHashMap<>();
-    private final Map<Long, Set<User>> userFriendIdsMap = new HashMap<>();
-    private final Map<Long, Set<Film>> likedFilmIdsMap = new HashMap<>();
+    private final Map<Long, User> userMap = new LinkedHashMap<>(); /* мапа пользователей */
+    private final Map<Long, Set<User>> userFriendIdsMap = new HashMap<>(); /* мапа множеств друзей пользователя */
+    private final Map<Long, Set<Film>> likedFilmIdsMap = new HashMap<>(); /* мапа понравившихся фильмов */
     private final IdGenerator idGenerator = new IdGenerator();
 
     @Override
@@ -35,8 +35,8 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public void addFriend(long userId, long friendId) {
-        if (!userFriendIdsMap.containsKey(userId)) {
-            userFriendIdsMap.put(userId, new HashSet<>());
+        if (!userFriendIdsMap.containsKey(userId)) { /* если множество друзей еще не создано */
+            userFriendIdsMap.put(userId, new HashSet<>()); /* то создаем */
         }
         userFriendIdsMap.get(userId).add(userMap.get(friendId));
     }

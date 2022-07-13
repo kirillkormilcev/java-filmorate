@@ -33,7 +33,7 @@ public class FilmService {
     }
 
     /**
-     * фильм по Id
+     * фильм по id
      */
     public Film getFilmById(Long filmId) {
         checkFilmId(filmId);
@@ -46,7 +46,7 @@ public class FilmService {
     public Film addFilmToStorage(Film film) {
         filmValidation(film);
         filmStorage.addFilm(film);
-        filmStorage.addOrRemoveFilmToSortedByLikesSet(film);
+        filmStorage.updateFilmInSortedByLikesSet(film);
         return film;
     }
 
@@ -57,7 +57,7 @@ public class FilmService {
         checkFilmId(film.getId());
         filmValidation(film);
         filmStorage.updateFilm(film);
-        filmStorage.addOrRemoveFilmToSortedByLikesSet(film);
+        filmStorage.updateFilmInSortedByLikesSet(film);
         return film;
     }
 
@@ -70,13 +70,13 @@ public class FilmService {
         filmStorage.addLikeUserToFilm(filmId, userId); /* добавить лайкнувшего пользователя к фильму */
         if (!userStorage.getLikedFilmIdsMap().containsKey(userId)) {
             userStorage.getLikedFilmIdsMap().put(userId, new HashSet<>());
-        }
+        } /* если в мапе еще не множества фильмов пролайканых пользователем, то создать */
         userStorage.getLikedFilmIdsMap().get(userId).add(filmStorage.getFilmMap().get(filmId));
         /* добавить понравившийся фильм пользователю */
         getFilmById(filmId).setLikesCount(filmStorage.getLikeIdsMap().get(filmId).size());
         /* обновить количество лайков у фильма */
-        filmStorage.addOrRemoveFilmToSortedByLikesSet(filmStorage.getFilmMap().get(filmId));
-        /* обновить фильм в сортированном множестве */
+        filmStorage.updateFilmInSortedByLikesSet(filmStorage.getFilmMap().get(filmId));
+        /* обновить фильм в сортированном по лайкам множестве фильмов */
         return filmStorage.getFilmMap().get(filmId);
     }
 
@@ -91,8 +91,8 @@ public class FilmService {
         /* удалить понравившийся фильм у пользователя */
         getFilmById(filmId).setLikesCount(filmStorage.getLikeIdsMap().get(filmId).size());
         /* обновить количество лайков у фильма */
-        filmStorage.addOrRemoveFilmToSortedByLikesSet(filmStorage.getFilmMap().get(filmId));
-        /* обновить фильм в сортированном множестве */
+        filmStorage.updateFilmInSortedByLikesSet(filmStorage.getFilmMap().get(filmId));
+        /* обновить фильм в сортированном по лайкам множестве фильмов */
         return filmStorage.getFilmMap().get(filmId);
     }
 

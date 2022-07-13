@@ -29,9 +29,6 @@ public class UserService {
      * список всех пользователей в хранилище
      */
     public List<User> getAllUsersFromStorage() {
-        if (userStorage.getUserMap().isEmpty()) {
-            throw new NotFoundException("В базе нет ни одного пользователя.");
-        }
         return userStorage.getListOfUsers();
     }
 
@@ -98,8 +95,8 @@ public class UserService {
      */
     public Set<User> getFriendsByUserId(long userId) {
         checkUserId(userId);
-        if (!userStorage.getUserFriendIdsMap().containsKey(userId)) {
-            return new HashSet<>();
+        if (!userStorage.getUserFriendIdsMap().containsKey(userId)) { /* если множество друзей еще не создано в мапе*/
+            return new HashSet<>(); /* то вернуть пустое множество */
         } else {
             return userStorage.getUserFriendIdsMap().get(userId);
         }
@@ -111,9 +108,9 @@ public class UserService {
     public List<User> getCommonFriends(long userId, long otherId) {
         checkUserId(userId);
         checkUserId(otherId);
-        Set<User> commonUserFriends = new HashSet<>(getFriendsByUserId(userId));
-        Set<User> otherFriends = new HashSet<>(getFriendsByUserId(otherId));
-        commonUserFriends.retainAll(otherFriends);
+        Set<User> commonUserFriends = new HashSet<>(getFriendsByUserId(userId)); /* множество друзей пользователя */
+        Set<User> otherFriends = new HashSet<>(getFriendsByUserId(otherId)); /* множество друзей другого пользователя */
+        commonUserFriends.retainAll(otherFriends); /* пересечение этих множеств (общие друзья) */
         if (commonUserFriends.isEmpty()) {
             return new ArrayList<>();
         } else {

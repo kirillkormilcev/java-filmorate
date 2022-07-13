@@ -39,7 +39,7 @@ public interface FilmStorage {
     /**
      * добавить фильм в сортированное по лайкам множество
      */
-    void addOrRemoveFilmToSortedByLikesSet(Film film);
+    void updateFilmInSortedByLikesSet(Film film);
 
     /**
      * геттер мапы фильмов
