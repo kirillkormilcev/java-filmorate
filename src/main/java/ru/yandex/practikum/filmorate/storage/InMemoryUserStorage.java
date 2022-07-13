@@ -35,6 +35,9 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public void addFriend(long userId, long friendId) {
+        if (!userFriendIdsMap.containsKey(userId)) {
+            userFriendIdsMap.put(userId, new HashSet<>());
+        }
         userFriendIdsMap.get(userId).add(userMap.get(friendId));
     }
 

@@ -42,6 +42,9 @@ public class InMemoryFilmStorage implements FilmStorage {
     public Film addFilm(Film film) {
         film.setId(idGenerator.getId());
         filmMap.put(film.getId(), film);
+        if (film.getLikesCount() > 0) {
+            sortedByLikeCountFilmSet.add(film);
+        }
         log.info("Получен POST запрос к эндпоинту /{}s, успешно обработан.\n" +
                         "В базу добавлен фильм: '{}' с id: '{}'.", film.getDataType().toString().toLowerCase(Locale.ROOT),
                 film.getName(), film.getId());
@@ -59,11 +62,24 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public void addLikeUserToFilm(long filmId, long userId) {
+        if (!likeIdsMap.containsKey(filmId)) {
+            likeIdsMap.put(filmId, new HashSet<>());
+        }
         likeIdsMap.get(filmId).add(userStorage.getUserMap().get(userId));
     }
 
     @Override
     public void removeLikeUserFromFilm(long filmId, long userId) {
         likeIdsMap.get(filmId).remove(userStorage.getUserMap().get(userId));
+    }
+
+    @Override
+    public void addOrRemoveFilmToSortedByLikesSet(Film film) {
+        if (film.getLikesCount() > 0) {
+            sortedByLikeCountFilmSet.add(film);
+        } else {
+            sortedByLikeCountFilmSet.remove(film);
+        }
+
     }
 }

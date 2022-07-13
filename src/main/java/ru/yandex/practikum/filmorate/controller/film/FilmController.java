@@ -53,7 +53,7 @@ public class FilmController {
     }
 
     @GetMapping("/popular")
-    public ResponseEntity<List<Film>> getPopularByCountOrFirstTenFilms(@RequestParam Integer count) {
+    public ResponseEntity<List<Film>> getPopularByCountOrFirstTenFilms(@RequestParam(required = false) Integer count) {
         return new ResponseEntity<>(filmService.getPopularOrTenFirstFilms(count), HttpStatus.OK);
     }
 }

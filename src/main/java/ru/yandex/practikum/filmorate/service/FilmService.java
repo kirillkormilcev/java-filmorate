@@ -10,6 +10,7 @@ import ru.yandex.practikum.filmorate.storage.FilmStorage;
 import ru.yandex.practikum.filmorate.storage.UserStorage;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -45,6 +46,7 @@ public class FilmService {
     public Film addFilmToStorage(Film film) {
         filmValidation(film);
         filmStorage.addFilm(film);
+        filmStorage.addOrRemoveFilmToSortedByLikesSet(film);
         return film;
     }
 
@@ -55,6 +57,7 @@ public class FilmService {
         checkFilmId(film.getId());
         filmValidation(film);
         filmStorage.updateFilm(film);
+        filmStorage.addOrRemoveFilmToSortedByLikesSet(film);
         return film;
     }
 
@@ -65,10 +68,15 @@ public class FilmService {
         checkFilmId(filmId);
         checkFilmId(userId);
         filmStorage.addLikeUserToFilm(filmId, userId); /* добавить лайкнувшего пользователя к фильму */
+        if (!userStorage.getLikedFilmIdsMap().containsKey(userId)) {
+            userStorage.getLikedFilmIdsMap().put(userId, new HashSet<>());
+        }
         userStorage.getLikedFilmIdsMap().get(userId).add(filmStorage.getFilmMap().get(filmId));
         /* добавить понравившийся фильм пользователю */
         getFilmById(filmId).setLikesCount(filmStorage.getLikeIdsMap().get(filmId).size());
         /* обновить количество лайков у фильма */
+        filmStorage.addOrRemoveFilmToSortedByLikesSet(filmStorage.getFilmMap().get(filmId));
+        /* обновить фильм в сортированном множестве */
         return filmStorage.getFilmMap().get(filmId);
     }
 
@@ -83,6 +91,8 @@ public class FilmService {
         /* удалить понравившийся фильм у пользователя */
         getFilmById(filmId).setLikesCount(filmStorage.getLikeIdsMap().get(filmId).size());
         /* обновить количество лайков у фильма */
+        filmStorage.addOrRemoveFilmToSortedByLikesSet(filmStorage.getFilmMap().get(filmId));
+        /* обновить фильм в сортированном множестве */
         return filmStorage.getFilmMap().get(filmId);
     }
 
@@ -90,6 +100,9 @@ public class FilmService {
      * популярные либо первые десять фильмов
      */
     public List<Film> getPopularOrTenFirstFilms(Integer count) {
+        if (count == null) {
+            return getTenFirstFilms();
+        }
         if (count < 0) {
             throw new IncorrectRequestParamException("Передано отрицательное количество лайков у фильма");
         }

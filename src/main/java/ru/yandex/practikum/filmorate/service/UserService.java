@@ -72,7 +72,9 @@ public class UserService {
         userStorage.addFriend(userId, friendId); /* добавить друга пользователю */
         userStorage.addFriend(friendId, userId); /* добавить пользователя другу */
         getUserById(userId).setFriendsCount(userStorage.getUserFriendIdsMap().get(userId).size());
-        /* обновить количество друзей */
+        /* обновить количество друзей пользователя*/
+        getUserById(friendId).setFriendsCount(userStorage.getUserFriendIdsMap().get(friendId).size());
+        /* обновить количество друзей у друга*/
         return getUserById(userId);
     }
 
@@ -86,6 +88,8 @@ public class UserService {
         userStorage.removeFriend(friendId, userId); /* удалить пользователя у друга */
         getUserById(userId).setFriendsCount(userStorage.getUserFriendIdsMap().get(userId).size());
         /* обновить количество друзей */
+        getUserById(friendId).setFriendsCount(userStorage.getUserFriendIdsMap().get(friendId).size());
+        /* обновить количество друзей у друга*/
         return getUserById(userId);
     }
 
@@ -94,10 +98,11 @@ public class UserService {
      */
     public Set<User> getFriendsByUserId(long userId) {
         checkUserId(userId);
-        if (userStorage.getUserFriendIdsMap().get(userId).isEmpty()) {
-            throw new NotFoundException("У пользователя с индексом: " + userId + " ни одного друга.");
+        if (!userStorage.getUserFriendIdsMap().containsKey(userId)) {
+            return new HashSet<>();
+        } else {
+            return userStorage.getUserFriendIdsMap().get(userId);
         }
-        return userStorage.getUserFriendIdsMap().get(userId);
     }
 
     /**
@@ -109,9 +114,10 @@ public class UserService {
         Set<User> common = new HashSet<>(getFriendsByUserId(userId));
         common.retainAll(getFriendsByUserId(otherId));
         if (common.isEmpty()) {
-            throw new NotFoundException("У пользователей с индексами: " + userId + ", " + otherId + " нет общих друзей.");
+            return new ArrayList<>();
+        } else {
+            return new ArrayList<>(common);
         }
-        return new ArrayList<>(common);
     }
 
     /**

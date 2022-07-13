@@ -37,6 +37,11 @@ public interface FilmStorage {
     void removeLikeUserFromFilm(long filmId, long userId);
 
     /**
+     * добавить фильм в сортированное по лайкам множество
+     */
+    void addOrRemoveFilmToSortedByLikesSet(Film film);
+
+    /**
      * геттер мапы фильмов
      */
     Map<Long, Film> getFilmMap();
