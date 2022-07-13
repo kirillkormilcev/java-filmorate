@@ -1,7 +1,6 @@
 package ru.yandex.practikum.filmorate.storage;
 
 import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.yandex.practikum.filmorate.model.film.Film;
@@ -10,7 +9,6 @@ import ru.yandex.practikum.filmorate.model.user.User;
 import java.util.*;
 
 @Component
-@Slf4j
 @Getter
 public class InMemoryFilmStorage implements FilmStorage {
     private final Map<Long, Film> filmMap = new LinkedHashMap<>();
@@ -45,18 +43,12 @@ public class InMemoryFilmStorage implements FilmStorage {
         if (film.getLikesCount() > 0) {
             sortedByLikeCountFilmSet.add(film);
         }
-        log.info("Получен POST запрос к эндпоинту /{}s, успешно обработан.\n" +
-                        "В базу добавлен фильм: '{}' с id: '{}'.", film.getDataType().toString().toLowerCase(Locale.ROOT),
-                film.getName(), film.getId());
         return film;
     }
 
     @Override
     public Film updateFilm(Film film) {
         filmMap.put(film.getId(), film);
-        log.info("Получен PUT запрос к эндпоинту: /{}s, успешно обработан.\n" +
-                        "В базе обновлен фильм: '{}' с id: '{}'.", film.getDataType().toString().toLowerCase(Locale.ROOT),
-                film.getName(), film.getId());
         return film;
     }
 

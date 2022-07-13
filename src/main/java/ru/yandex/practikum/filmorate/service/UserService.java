@@ -111,12 +111,13 @@ public class UserService {
     public List<User> getCommonFriends(long userId, long otherId) {
         checkUserId(userId);
         checkUserId(otherId);
-        Set<User> common = new HashSet<>(getFriendsByUserId(userId));
-        common.retainAll(getFriendsByUserId(otherId));
-        if (common.isEmpty()) {
+        Set<User> commonUserFriends = new HashSet<>(getFriendsByUserId(userId));
+        Set<User> otherFriends = new HashSet<>(getFriendsByUserId(otherId));
+        commonUserFriends.retainAll(otherFriends);
+        if (commonUserFriends.isEmpty()) {
             return new ArrayList<>();
         } else {
-            return new ArrayList<>(common);
+            return new ArrayList<>(commonUserFriends);
         }
     }
 
