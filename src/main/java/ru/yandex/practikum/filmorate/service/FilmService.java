@@ -1,20 +1,19 @@
 package ru.yandex.practikum.filmorate.service;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import ru.yandex.practikum.filmorate.exception.FilmValidationException;
+import ru.yandex.practikum.filmorate.exception.IncorrectRequestParamException;
+import ru.yandex.practikum.filmorate.exception.NotFoundException;
 import ru.yandex.practikum.filmorate.model.film.Film;
 import ru.yandex.practikum.filmorate.storage.FilmStorage;
 import ru.yandex.practikum.filmorate.storage.UserStorage;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
-@Slf4j
 public class FilmService {
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
@@ -25,89 +24,130 @@ public class FilmService {
         this.userStorage = userStorage;
     }
 
-    public ResponseEntity<List<Film>> getAllUsersFromStorage() {
-        if (filmStorage.getFilmMap().isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } else {
-            return new ResponseEntity<>(filmStorage.getListOfFilms(), HttpStatus.OK);
-        }
+    /**
+     * список всех фильмов в хранилище
+     */
+    public List<Film> getAllFilmsFromStorage() {
+        return filmStorage.getListOfFilms();
     }
 
-    public ResponseEntity<Film> addFilmToStorage (Film film) {
-        if (filmValidation(film)) {
-            filmStorage.addFilm(film);
-            return new ResponseEntity<>(film, HttpStatus.CREATED);
-        } else {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST); /* TODO вернуть разные коды в зависимости от ситуации*/
-        }
-    }
-
-    public ResponseEntity<Film> updateFilmInStorage(Film film) {
-        if (filmValidation(film)) {
-            filmStorage.updateFilm(film);
-            return new ResponseEntity<>(film, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST); /* TODO вернуть разные коды в зависимости от ситуации*/
-        }
-    }
-
-    public ResponseEntity<HttpStatus> addLikeToFilm (long filmId, long userId) {
-        //TODO check, throw
-        filmStorage.addLikeUserToFilm(filmId, userId); /* добавить лайкнувшего пользователя к фильму */
-        userStorage.addLikeFilmToUser(userId, filmId); /* добавить понравившийся фильм пользователю */
-        getFilmById(filmId).setLikesCount(filmStorage.getLikeIdsMap().get(filmId).size());
-        /* обновить количество лайков у фильма */
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
-
-    public ResponseEntity<HttpStatus> removeLikeFromFilm (long filmId, long userId) {
-        //TODO check, throw
-        filmStorage.removeLikeUserFromFilm(filmId, userId); /* удалить лайкнувшего пользователя у фильма */
-        userStorage.removeLikeFilmFromUser(userId, filmId); /* удалить понравившийся фильм у пользователя */
-        getFilmById(filmId).setLikesCount(filmStorage.getLikeIdsMap().get(filmId).size());
-        /* обновить количество лайков у фильма */
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
-
-    public Film getFilmById (Long filmId) {
-        //TODO check, throw
+    /**
+     * фильм по Id
+     */
+    public Film getFilmById(Long filmId) {
+        checkFilmId(filmId);
         return filmStorage.getFilmMap().get(filmId);
     }
 
-    private boolean filmValidation(Film film) {
+    /**
+     * добавить фильм в хранилище
+     */
+    public Film addFilmToStorage(Film film) {
+        filmValidation(film);
+        filmStorage.addFilm(film);
+        return film;
+    }
+
+    /**
+     * обновить фильм в хранилище
+     */
+    public Film updateFilmInStorage(Film film) {
+        checkFilmId(film.getId());
+        filmValidation(film);
+        filmStorage.updateFilm(film);
+        return film;
+    }
+
+    /**
+     * поставить лайк фильму
+     */
+    public Film addLikeToFilm(long filmId, long userId) {
+        checkFilmId(filmId);
+        checkFilmId(userId);
+        filmStorage.addLikeUserToFilm(filmId, userId); /* добавить лайкнувшего пользователя к фильму */
+        userStorage.getLikedFilmIdsMap().get(userId).add(filmStorage.getFilmMap().get(filmId));
+        /* добавить понравившийся фильм пользователю */
+        getFilmById(filmId).setLikesCount(filmStorage.getLikeIdsMap().get(filmId).size());
+        /* обновить количество лайков у фильма */
+        return filmStorage.getFilmMap().get(filmId);
+    }
+
+    /**
+     * удалить лайк у фильма
+     */
+    public Film removeLikeFromFilm(long filmId, long userId) {
+        checkFilmId(filmId);
+        checkFilmId(userId);
+        filmStorage.removeLikeUserFromFilm(filmId, userId); /* удалить лайкнувшего пользователя у фильма */
+        userStorage.getLikedFilmIdsMap().get(userId).remove(filmStorage.getFilmMap().get(filmId));
+        /* удалить понравившийся фильм у пользователя */
+        getFilmById(filmId).setLikesCount(filmStorage.getLikeIdsMap().get(filmId).size());
+        /* обновить количество лайков у фильма */
+        return filmStorage.getFilmMap().get(filmId);
+    }
+
+    /**
+     * популярные либо первые десять фильмов
+     */
+    public List<Film> getPopularOrTenFirstFilms(Integer count) {
+        if (count < 0) {
+            throw new IncorrectRequestParamException("Передано отрицательное количество лайков у фильма");
+        }
+        if (count != 0) {
+            return getMostPopularFilmsByCount(count);
+        } else {
+            return getTenFirstFilms();
+        }
+    }
+
+    /**
+     * фильмы с наибольшим количеством лайков по указанному количеству
+     */
+    private List<Film> getMostPopularFilmsByCount(Integer count) {
+        return filmStorage.getSortedByLikeCountFilmSet().stream().limit(count).collect(Collectors.toList());
+    }
+
+    /**
+     * десять первых фильмов
+     */
+    private List<Film> getTenFirstFilms() {
+        return filmStorage.getFilmMap().values().stream().limit(10).collect(Collectors.toList());
+    }
+
+    /**
+     * проверка фильма
+     */
+    private void filmValidation(Film film) {
         if (film.getDescription().length() > 200) {
-            log.warn("Попытка добавить или обновить фильм: '{}' с описанием более 200 символов:\n'{}'.",
-                    film.getName(), film.getDescription());
-            throw new FilmValidationException("Описание фильма содержит более 200 символов.");
+            throw new FilmValidationException("Описание (" + film.getDescription() + ") фильма (" + film.getName()
+                    + ") содержит более 200 символов.");
         }
         if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
-            log.warn("Попытка добавить или обновить фильм: '{}' с датой релиза ранее 1895.12.28: '{}'.",
-                    film.getName(), film.getReleaseDate());
-            throw new FilmValidationException("Дата релиза фильма ранее 28 декабря 1895 года.");
+            throw new FilmValidationException("Дата релиза (" + film.getReleaseDate() + ") фильма (" + film.getName()
+                    + ") ранее 28 декабря 1895 года.");
         }
         if (film.getDuration() < 0) {
-            log.warn("Попытка добавить или обновить фильм: '{}' с отрицательной длительностью: '{}'.",
-                    film.getName(), film.getDuration());
-            throw new FilmValidationException("Продолжительность фильма отрицательная.");
-        }
-        if (film.getId() != 0) {
-            if (!filmStorage.getFilmMap().containsKey(film.getId())) {
-                log.warn("Попытка обновить фильм: '{}' с индексом '{}', отсутствующим в базе.", film.getName(),
-                        film.getId());
-                throw new FilmValidationException("Фильма с таким индексом нет в базе.");
-            }
+            throw new FilmValidationException("Продолжительность фильма " + film.getName() + " отрицательная: "
+                    + film.getDuration() + ".");
         }
         for (Film filmAvailable : filmStorage.getFilmMap().values()) {
             if (film.getName().equals(filmAvailable.getName())) {
                 if (filmAvailable.getId() == film.getId()) {
-                    return true;
+                    return;
                 } else {
-                    log.warn("Попытка обновить или добавить фильм: '{}', который уже есть в базе (id: '{}').",
-                            film.getName(), filmAvailable.getId());
-                    throw new FilmValidationException("Фильм с таким названием уже есть в базе.");
+                    throw new FilmValidationException("Фильм " + film.getName() + " с таким названием уже есть в базе " +
+                            "под индексом: " + filmAvailable.getId() + ".");
                 }
             }
         }
-        return true;
+    }
+
+    /**
+     * проверка наличия индекса фильма в базе
+     */
+    private void checkFilmId(long filmId) {
+        if (!filmStorage.getFilmMap().containsKey(filmId)) {
+            throw new NotFoundException("Фильма с индексом: " + filmId + " нет в базе фильмов.");
+        }
     }
 }

@@ -2,15 +2,15 @@ package ru.yandex.practikum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import ru.yandex.practikum.filmorate.exception.NotFoundException;
 import ru.yandex.practikum.filmorate.exception.UserValidationException;
 import ru.yandex.practikum.filmorate.model.user.User;
 import ru.yandex.practikum.filmorate.storage.UserStorage;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -25,86 +25,128 @@ public class UserService {
         this.userStorage = userStorage;
     }
 
-    public ResponseEntity<List<User>> getAllUsersFromStorage() {
+    /**
+     * список всех пользователей в хранилище
+     */
+    public List<User> getAllUsersFromStorage() {
         if (userStorage.getUserMap().isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } else {
-            return new ResponseEntity<>(userStorage.getListOfUsers(), HttpStatus.OK);
+            throw new NotFoundException("В базе нет ни одного пользователя.");
         }
+        return userStorage.getListOfUsers();
     }
 
-    public ResponseEntity<User> addUserToStorage (User user) {
-        if (userValidation(user)) {
-            userStorage.addUser(user);
-            return new ResponseEntity<>(user, HttpStatus.CREATED);
-        } else {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST); /* TODO вернуть разные коды в зависимости от ситуации*/
-        }
+    /**
+     * пользователь по Id
+     */
+    public User getUserById(Long userId) {
+        checkUserId(userId);
+        return userStorage.getUserMap().get(userId);
     }
 
-    public ResponseEntity<User> updateUserInStorage (User user) {
-        if (userValidation(user)) {
-            userStorage.updateUser(user);
-            return new ResponseEntity<>(user, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST); /* TODO вернуть разные коды в зависимости от ситуации*/
-        }
+    /**
+     * добавить пользователя в хранилище
+     */
+    public User addUserToStorage(User user) {
+        userValidation(user);
+        userStorage.addUser(user);
+        return user;
+
     }
 
-    public ResponseEntity<HttpStatus> addFriendToUser (long userId, long friendId) {
-        //TODO check, throw
+    /**
+     * обновить пользователя в хранилище
+     */
+    public User updateUserInStorage(User user) {
+        checkUserId(user.getId());
+        userValidation(user);
+        userStorage.updateUser(user);
+        return user;
+    }
+
+    /**
+     * добавить друга пользователю
+     */
+    public User addFriendToUser(long userId, long friendId) {
+        checkUserId(userId);
+        checkUserId(friendId);
         userStorage.addFriend(userId, friendId); /* добавить друга пользователю */
         userStorage.addFriend(friendId, userId); /* добавить пользователя другу */
         getUserById(userId).setFriendsCount(userStorage.getUserFriendIdsMap().get(userId).size());
         /* обновить количество друзей */
-        return new ResponseEntity<>(HttpStatus.OK);
+        return getUserById(userId);
     }
 
-    public ResponseEntity<HttpStatus> removeFriendFromUser (long userId, long friendId) {
-        //TODO check, throw
+    /**
+     * удалить друга у пользователя
+     */
+    public User removeFriendFromUser(long userId, long friendId) {
+        checkUserId(userId);
+        checkUserId(friendId);
         userStorage.removeFriend(userId, friendId); /* удалить друга у пользователя */
         userStorage.removeFriend(friendId, userId); /* удалить пользователя у друга */
         getUserById(userId).setFriendsCount(userStorage.getUserFriendIdsMap().get(userId).size());
         /* обновить количество друзей */
-        return new ResponseEntity<>(HttpStatus.OK);
+        return getUserById(userId);
     }
 
-    public ResponseEntity<Set<User>> getFriendsByUserId (long userId) {
-        //TODO check, throw
-        return new ResponseEntity<>(userStorage.getUserFriendIdsMap().get(userId), HttpStatus.OK);
+    /**
+     * множество друзей пользователя
+     */
+    public Set<User> getFriendsByUserId(long userId) {
+        checkUserId(userId);
+        if (userStorage.getUserFriendIdsMap().get(userId).isEmpty()) {
+            throw new NotFoundException("У пользователя с индексом: " + userId + " ни одного друга.");
+        }
+        return userStorage.getUserFriendIdsMap().get(userId);
     }
 
-    public User getUserById (Long userId) {
-        //TODO check, throw
-        return userStorage.getUserMap().get(userId);
+    /**
+     * общие друзья двух пользователей
+     */
+    public List<User> getCommonFriends(long userId, long otherId) {
+        checkUserId(userId);
+        checkUserId(otherId);
+        Set<User> common = new HashSet<>(getFriendsByUserId(userId));
+        common.retainAll(getFriendsByUserId(otherId));
+        if (common.isEmpty()) {
+            throw new NotFoundException("У пользователей с индексами: " + userId + ", " + otherId + " нет общих друзей.");
+        }
+        return new ArrayList<>(common);
     }
 
-    private boolean userValidation(User user) {
+    /**
+     * проверка пользователя
+     */
+    private void userValidation(User user) {
         if (user.getLogin().contains(" ")) {
-            log.warn("Попытка добавить или обновить пользователя с логином: '{}', содержащего пробелы.", user.getLogin());
-            throw new UserValidationException("В логине присутствуют пробелы.");
+            throw new UserValidationException("В логине " + user.getLogin() + " присутствуют пробелы.");
         }
         if (user.getName().trim().isBlank()) {
-            log.info("Пользователю с логином: '{}' назначено аналогичное имя.", user.getLogin());
+            log.info("Пользователю с логином: '{}' назначено аналогичное имя.", user.getLogin()); //TODO надо ли?
             user.setName(user.getLogin());
         }
         if (user.getBirthday().isAfter(LocalDate.now())) {
-            log.warn("Попытка добавить или обновить пользователя с логином: '{}' с некорректной датой рождения: '{}'.",
-                    user.getLogin(), user.getBirthday());
-            throw new UserValidationException("Не корректная дата рождения.");
+            throw new UserValidationException("Не корректная дата рождения: " + user.getBirthday() + " у пользователя: "
+                    + user.getLogin() + ".");
         }
         for (User userAvailable : userStorage.getUserMap().values()) {
             if (user.getEmail().equals(userAvailable.getEmail())) {
                 if (userAvailable.getId() == user.getId()) {
-                    return true;
+                    return;
                 } else {
-                    log.warn("Попытка добавить или обновить пользователя с логином: '{}' с уже существующей в базе почтой: '{}'.",
-                            user.getLogin(), user.getEmail());
-                    throw new UserValidationException("Пользователь с такой почтой уже зарегистрирован в базе.");
+                    throw new UserValidationException("Пользователь с почтой " + user.getEmail()
+                            + " уже зарегистрирован в базе.");
                 }
             }
         }
-        return true;
     }
 
+    /**
+     * проверка наличия id пользователя в базе
+     */
+    private void checkUserId(long userId) {
+        if (!userStorage.getUserMap().containsKey(userId)) {
+            throw new NotFoundException("Пользователя с индексом: " + userId + " нет в базе пользователей.");
+        }
+    }
 }

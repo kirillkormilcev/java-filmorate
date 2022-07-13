@@ -15,7 +15,7 @@ import java.time.LocalDate;
 @EqualsAndHashCode
 @Data
 @Builder
-public class Film{
+public class Film {
     private long id;
     @NotNull
     @NotBlank

@@ -6,29 +6,49 @@ import ru.yandex.practikum.filmorate.model.user.User;
 import java.util.*;
 
 public interface FilmStorage {
-    Map<Long, Film> filmMap = new LinkedHashMap<>();
-    Map<Long, Set<User>> likeIdsMap = new HashMap<>();
-    IdGenerator idGenerator = new IdGenerator();
+    Map<Long, Film> filmMap = null;
+    SortedSet<Film> sortedByLikeCountFilmSet = null;
+    Map<Long, Set<User>> likeIdsMap = null;
+    IdGenerator idGenerator = null;
 
-    /** список всех фильмов */
+    /**
+     * список всех фильмов
+     */
     List<Film> getListOfFilms();
 
-    /** добавить фильм */
+    /**
+     * добавить фильм
+     */
     Film addFilm(Film film);
 
-    /** обновить фильм*/
+    /**
+     * обновить фильм
+     */
     Film updateFilm(Film film);
 
-    /** добавить лайк */
+    /**
+     * добавить лайк
+     */
     void addLikeUserToFilm(long filmId, long userId);
 
-    /** удалить лайк */
+    /**
+     * удалить лайк
+     */
     void removeLikeUserFromFilm(long filmId, long userId);
 
-    /** геттер мапы фильмов*/
+    /**
+     * геттер мапы фильмов
+     */
     Map<Long, Film> getFilmMap();
 
-    /** геттер лайков фильма*/
+    /**
+     * геттер лайков фильма
+     */
     Map<Long, Set<User>> getLikeIdsMap();
+
+    /**
+     * геттер сета сортированных по лайкам фильмов
+     */
+    SortedSet<Film> getSortedByLikeCountFilmSet();
 }
 

@@ -1,6 +1,5 @@
 package ru.yandex.practikum.filmorate.model.user;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -10,8 +9,6 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * класс пользователя
@@ -19,7 +16,7 @@ import java.util.Set;
 @EqualsAndHashCode
 @Data
 @Builder
-public class User{
+public class User {
     private long id;
     @NotNull
     @NotBlank

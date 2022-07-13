@@ -12,8 +12,18 @@ import java.util.*;
 @Component
 @Slf4j
 @Getter
-public class InMemoryFilmStorage implements FilmStorage{
+public class InMemoryFilmStorage implements FilmStorage {
     private final Map<Long, Film> filmMap = new LinkedHashMap<>();
+    Comparator<Film> comparatorSortByLikeCount = (o1, o2) -> {
+        if (o2.getLikesCount() > o1.getLikesCount()) {
+            return 1;
+        } else if (o2.getLikesCount() < o1.getLikesCount()) {
+            return -1;
+        } else {
+            return (int) (o2.getId() - o1.getId());
+        }
+    };
+    private final SortedSet<Film> sortedByLikeCountFilmSet = new TreeSet<>(comparatorSortByLikeCount);
     private final Map<Long, Set<User>> likeIdsMap = new HashMap<>();
     private final IdGenerator idGenerator = new IdGenerator();
     private final UserStorage userStorage;
@@ -55,6 +65,5 @@ public class InMemoryFilmStorage implements FilmStorage{
     @Override
     public void removeLikeUserFromFilm(long filmId, long userId) {
         likeIdsMap.get(filmId).remove(userStorage.getUserMap().get(userId));
-
     }
 }
