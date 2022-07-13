@@ -13,7 +13,7 @@ import ru.yandex.practikum.filmorate.model.ErrorResponse;
 import ru.yandex.practikum.filmorate.service.FilmService;
 import ru.yandex.practikum.filmorate.service.UserService;
 
-@RestControllerAdvice(assignableTypes = {UserService.class, FilmService.class})
+@RestControllerAdvice({"ru.yandex.practikum.filmorate.controller", "ru.yandex.practikum.filmorate.service"})
 @Slf4j
 public class ErrorHandler {
     @ExceptionHandler
