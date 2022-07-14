@@ -1,5 +1,6 @@
 package ru.yandex.practikum.filmorate.service;
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ import java.util.Set;
 @Service
 @Slf4j
 public class UserService {
+    @Getter //для Junit тестов
     private final UserStorage userStorage;
 
     @Autowired
@@ -37,7 +39,7 @@ public class UserService {
      */
     public User getUserById(Long userId) {
         checkUserId(userId);
-        return userStorage.getUserMap().get(userId);
+        return userStorage.getUsers().get(userId);
     }
 
     /**
@@ -68,9 +70,9 @@ public class UserService {
         checkUserId(friendId);
         userStorage.addFriend(userId, friendId); /* добавить друга пользователю */
         userStorage.addFriend(friendId, userId); /* добавить пользователя другу */
-        getUserById(userId).setFriendsCount(userStorage.getUserFriendIdsMap().get(userId).size());
+        getUserById(userId).setFriendsCount(userStorage.getUserFriendIds().get(userId).size());
         /* обновить количество друзей пользователя*/
-        getUserById(friendId).setFriendsCount(userStorage.getUserFriendIdsMap().get(friendId).size());
+        getUserById(friendId).setFriendsCount(userStorage.getUserFriendIds().get(friendId).size());
         /* обновить количество друзей у друга*/
         return getUserById(userId);
     }
@@ -83,9 +85,9 @@ public class UserService {
         checkUserId(friendId);
         userStorage.removeFriend(userId, friendId); /* удалить друга у пользователя */
         userStorage.removeFriend(friendId, userId); /* удалить пользователя у друга */
-        getUserById(userId).setFriendsCount(userStorage.getUserFriendIdsMap().get(userId).size());
+        getUserById(userId).setFriendsCount(userStorage.getUserFriendIds().get(userId).size());
         /* обновить количество друзей */
-        getUserById(friendId).setFriendsCount(userStorage.getUserFriendIdsMap().get(friendId).size());
+        getUserById(friendId).setFriendsCount(userStorage.getUserFriendIds().get(friendId).size());
         /* обновить количество друзей у друга*/
         return getUserById(userId);
     }
@@ -95,10 +97,10 @@ public class UserService {
      */
     public Set<User> getFriendsByUserId(long userId) {
         checkUserId(userId);
-        if (!userStorage.getUserFriendIdsMap().containsKey(userId)) { /* если множество друзей еще не создано в мапе*/
+        if (!userStorage.getUserFriendIds().containsKey(userId)) { /* если множество друзей еще не создано в мапе*/
             return new HashSet<>(); /* то вернуть пустое множество */
         } else {
-            return userStorage.getUserFriendIdsMap().get(userId);
+            return userStorage.getUserFriendIds().get(userId);
         }
     }
 
@@ -133,7 +135,7 @@ public class UserService {
             throw new UserValidationException("Не корректная дата рождения: " + user.getBirthday() + " у пользователя: "
                     + user.getLogin() + ".");
         }
-        for (User userAvailable : userStorage.getUserMap().values()) {
+        for (User userAvailable : userStorage.getUsers().values()) {
             if (user.getEmail().equals(userAvailable.getEmail())) {
                 if (userAvailable.getId() == user.getId()) {
                     return;
@@ -149,7 +151,7 @@ public class UserService {
      * проверка наличия id пользователя в базе
      */
     private void checkUserId(long userId) {
-        if (!userStorage.getUserMap().containsKey(userId)) {
+        if (!userStorage.getUsers().containsKey(userId)) {
             throw new NotFoundException("Пользователя с индексом: " + userId + " нет в базе пользователей.");
         }
     }

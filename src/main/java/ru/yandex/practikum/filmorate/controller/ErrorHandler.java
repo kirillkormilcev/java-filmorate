@@ -2,8 +2,8 @@ package ru.yandex.practikum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.yandex.practikum.filmorate.exception.FilmValidationException;
 import ru.yandex.practikum.filmorate.exception.IncorrectRequestParamException;
@@ -15,30 +15,30 @@ import ru.yandex.practikum.filmorate.model.ErrorResponse;
 @Slf4j
 public class ErrorHandler {
     @ExceptionHandler
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handleNotFoundException(final NotFoundException e) {
+    public ResponseEntity<ErrorResponse> handleNotFoundException(final NotFoundException e) {
         log.warn(e.getMessage());
-        return new ErrorResponse("Объект(-ы) не найден(-ы).", e.getMessage());
+        return new ResponseEntity<>(new ErrorResponse("Объект(-ы) не найден(-ы).", e.getMessage()),
+                HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleFilmValidationException(final FilmValidationException e) {
+    public ResponseEntity<ErrorResponse> handleFilmValidationException(final FilmValidationException e) {
         log.warn(e.getMessage());
-        return new ErrorResponse("Не корректно(-ы)е поле(-я) фильма.", e.getMessage());
+        return new ResponseEntity<>( new ErrorResponse("Не корректно(-ы)е поле(-я) фильма.", e.getMessage()),
+                HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleUserValidationException(final UserValidationException e) {
+    public ResponseEntity<ErrorResponse> handleUserValidationException(final UserValidationException e) {
         log.warn(e.getMessage());
-        return new ErrorResponse("Не корректно(-ы)е поле(-я) пользователя.", e.getMessage());
+        return new ResponseEntity<>( new ErrorResponse("Не корректно(-ы)е поле(-я) пользователя.", e.getMessage()),
+                HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleIncorrectRequestParamException(final IncorrectRequestParamException e) {
+    public ResponseEntity<ErrorResponse> handleIncorrectRequestParamException(final IncorrectRequestParamException e) {
         log.warn(e.getMessage());
-        return new ErrorResponse("Не корректный параметр запроса.", e.getMessage());
+        return new ResponseEntity<>( new ErrorResponse("Не корректный параметр запроса.", e.getMessage()),
+                HttpStatus.BAD_REQUEST);
     }
 }

@@ -6,10 +6,6 @@ import ru.yandex.practikum.filmorate.model.user.User;
 import java.util.*;
 
 public interface UserStorage {
-    Map<Long, User> users = null;
-    Map<Long, Set<User>> userFriendIdsMap = null;
-    Map<Long, Set<Film>> likedFilmIdsMap = null;
-    IdGenerator idGenerator = null;
 
     /**
      * список всех фильмов
@@ -39,16 +35,16 @@ public interface UserStorage {
     /**
      * геттер мапы пользователей
      */
-    Map<Long, User> getUserMap();
+    Map<Long, User> getUsers();
 
     /**
      * геттер мапы друзей пользователя
      */
-    Map<Long, Set<User>> getUserFriendIdsMap();
+    Map<Long, Set<User>> getUserFriendIds();
 
     /**
      * геттер мапы пролайканых фильмов пользователя
      */
-    Map<Long, Set<Film>> getLikedFilmIdsMap();
+    Map<Long, Set<Film>> getLikedFilmIds();
 }
 

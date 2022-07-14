@@ -11,19 +11,8 @@ import java.util.*;
 @Component
 @Getter
 public class InMemoryFilmStorage implements FilmStorage {
-    private final Map<Long, Film> filmMap = new LinkedHashMap<>(); /* мапа фильмов */
-    Comparator<Film> comparatorSortByLikeCount = (o1, o2) -> { /* компаратор сортировки по количеству лайков */
-        if (o2.getLikesCount() > o1.getLikesCount()) {
-            return 1;
-        } else if (o2.getLikesCount() < o1.getLikesCount()) {
-            return -1;
-        } else {
-            return (int) (o2.getId() - o1.getId()); /* при равных лайках по id */
-        }
-    };
-    private final SortedSet<Film> sortedByLikeCountFilmSet = new TreeSet<>(comparatorSortByLikeCount);
-    /* множество фильмов, сортированных по количеству лайков */
-    private final Map<Long, Set<User>> likeIdsMap = new HashMap<>(); /* мапа множеств лайкнувших пользователей */
+    private final Map<Long, Film> films = new LinkedHashMap<>(); /* мапа фильмов */
+    private final Map<Long, Set<User>> likeIds = new HashMap<>(); /* мапа множеств лайкнувших пользователей */
     private final IdGenerator idGenerator = new IdGenerator();
     private final UserStorage userStorage;
 
@@ -34,48 +23,32 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public List<Film> getListOfFilms() {
-        return new ArrayList<>(filmMap.values());
+        return new ArrayList<>(films.values());
     }
 
     @Override
     public Film addFilm(Film film) {
         film.setId(idGenerator.getId());
-        filmMap.put(film.getId(), film);
-        if (film.getLikesCount() > 0) {
-            sortedByLikeCountFilmSet.add(film);
-        }
+        films.put(film.getId(), film);
         return film;
     }
 
     @Override
     public Film updateFilm(Film film) {
-        filmMap.put(film.getId(), film);
-        if (film.getLikesCount() > 0) { /* TODO надо ли? может прилететь на обновление фильм с измененным количеством лайков */
-            sortedByLikeCountFilmSet.add(film);
-        }
+        films.put(film.getId(), film);
         return film;
     }
 
     @Override
     public void addLikeUserToFilm(long filmId, long userId) {
-        if (!likeIdsMap.containsKey(filmId)) { /* если множество лайкнувших пользователей еще не создано */
-            likeIdsMap.put(filmId, new HashSet<>()); /* то создаем */
+        if (!likeIds.containsKey(filmId)) { /* если множество лайкнувших пользователей еще не создано */
+            likeIds.put(filmId, new HashSet<>()); /* то создаем */
         }
-        likeIdsMap.get(filmId).add(userStorage.getUserMap().get(userId));
+        likeIds.get(filmId).add(userStorage.getUsers().get(userId));
     }
 
     @Override
     public void removeLikeUserFromFilm(long filmId, long userId) {
-        likeIdsMap.get(filmId).remove(userStorage.getUserMap().get(userId));
-    }
-
-    @Override
-    public void updateFilmInSortedByLikesSet(Film film) {
-        if (film.getLikesCount() > 0) {
-            sortedByLikeCountFilmSet.add(film);
-        } else {
-            sortedByLikeCountFilmSet.remove(film);
-        }
-
+        likeIds.get(filmId).remove(userStorage.getUsers().get(userId));
     }
 }

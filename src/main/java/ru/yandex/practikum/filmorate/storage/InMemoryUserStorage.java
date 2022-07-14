@@ -10,39 +10,39 @@ import java.util.*;
 @Component
 @Getter
 public class InMemoryUserStorage implements UserStorage {
-    private final Map<Long, User> userMap = new LinkedHashMap<>(); /* мапа пользователей */
-    private final Map<Long, Set<User>> userFriendIdsMap = new HashMap<>(); /* мапа множеств друзей пользователя */
-    private final Map<Long, Set<Film>> likedFilmIdsMap = new HashMap<>(); /* мапа понравившихся фильмов */
+    private final Map<Long, User> users = new LinkedHashMap<>(); /* мапа пользователей */
+    private final Map<Long, Set<User>> userFriendIds = new HashMap<>(); /* мапа множеств друзей пользователя */
+    private final Map<Long, Set<Film>> likedFilmIds = new HashMap<>(); /* мапа понравившихся фильмов */
     private final IdGenerator idGenerator = new IdGenerator();
 
     @Override
     public List<User> getListOfUsers() {
-        return new ArrayList<>(userMap.values());
+        return new ArrayList<>(users.values());
     }
 
     @Override
     public User addUser(User user) {
         user.setId(idGenerator.getId());
-        userMap.put(user.getId(), user);
+        users.put(user.getId(), user);
         return user;
     }
 
     @Override
     public User updateUser(User user) {
-        userMap.put(user.getId(), user);
+        users.put(user.getId(), user);
         return user;
     }
 
     @Override
     public void addFriend(long userId, long friendId) {
-        if (!userFriendIdsMap.containsKey(userId)) { /* если множество друзей еще не создано */
-            userFriendIdsMap.put(userId, new HashSet<>()); /* то создаем */
+        if (!userFriendIds.containsKey(userId)) { /* если множество друзей еще не создано */
+            userFriendIds.put(userId, new HashSet<>()); /* то создаем */
         }
-        userFriendIdsMap.get(userId).add(userMap.get(friendId));
+        userFriendIds.get(userId).add(users.get(friendId));
     }
 
     @Override
     public void removeFriend(long userId, long friendId) {
-        userFriendIdsMap.get(userId).remove(userMap.get(friendId));
+        userFriendIds.get(userId).remove(users.get(friendId));
     }
 }

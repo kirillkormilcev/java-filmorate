@@ -59,14 +59,9 @@ public class FilmController {
     }
 
     @GetMapping("/popular")
-    public ResponseEntity<List<Film>> getPopularByCountOrFirstTenFilms(@RequestParam(required = false) Integer count) {
-        String logText;
-        if (count == null) {
-            logText = "";
-        } else {
-            logText = "?count=" + count;
-        }
-        log.info("Обработка эндпойнта GET /films/popular{}", logText);
+    public ResponseEntity<List<Film>> getPopularByCountOrFirstTenFilms(@RequestParam(required = false,
+            defaultValue = "10") Integer count) {
+        log.info("Обработка эндпойнта GET /films/popular{}", "?count=" + count);
         return new ResponseEntity<>(filmService.getPopularOrTenFirstFilms(count), HttpStatus.OK);
     }
 }
