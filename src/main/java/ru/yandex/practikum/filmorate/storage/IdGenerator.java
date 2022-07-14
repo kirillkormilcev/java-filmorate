@@ -4,13 +4,12 @@ import lombok.Setter;
 
 @Setter
 public class IdGenerator {
-
-    private int id = 1;
+    private long id = 1L;
 
     protected IdGenerator() {
     }
 
-    public int getId() {
+    public long getId() {
         return id++;
     }
 }

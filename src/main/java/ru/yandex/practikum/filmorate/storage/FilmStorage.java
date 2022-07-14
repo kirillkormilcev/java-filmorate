@@ -1,27 +1,46 @@
 package ru.yandex.practikum.filmorate.storage;
 
-import org.springframework.stereotype.Component;
 import ru.yandex.practikum.filmorate.model.film.Film;
+import ru.yandex.practikum.filmorate.model.user.User;
 
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-@Component
 public interface FilmStorage {
-    Map<Integer, Film> films = new LinkedHashMap<>();
-    IdGenerator idGenerator = new IdGenerator();
 
-    /** список всех фильмов */
+    /**
+     * список всех фильмов
+     */
     List<Film> getListOfFilms();
 
-    /** добавить фильм */
+    /**
+     * добавить фильм
+     */
     Film addFilm(Film film);
 
-    /** обновить фильм*/
+    /**
+     * обновить фильм
+     */
     Film updateFilm(Film film);
 
-    /** геттер мапы фильмов*/
-    Map<Integer, Film> getFilms();
+    /**
+     * добавить лайк
+     */
+    void addLikeUserToFilm(long filmId, long userId);
+
+    /**
+     * удалить лайк
+     */
+    void removeLikeUserFromFilm(long filmId, long userId);
+
+    /**
+     * геттер мапы фильмов
+     */
+    Map<Long, Film> getFilms();
+
+    /**
+     * геттер лайков фильма
+     */
+    Map<Long, Set<User>> getLikeIds();
+
 }
 

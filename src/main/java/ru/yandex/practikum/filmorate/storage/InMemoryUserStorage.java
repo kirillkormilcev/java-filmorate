@@ -1,17 +1,18 @@
 package ru.yandex.practikum.filmorate.storage;
 
 import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import ru.yandex.practikum.filmorate.model.film.Film;
 import ru.yandex.practikum.filmorate.model.user.User;
 
 import java.util.*;
 
 @Component
-@Slf4j
 @Getter
-public class InMemoryUserStorage implements UserStorage{
-    private final Map<Integer, User> users = new LinkedHashMap<>();
+public class InMemoryUserStorage implements UserStorage {
+    private final Map<Long, User> users = new LinkedHashMap<>(); /* мапа пользователей */
+    private final Map<Long, Set<User>> userFriendIds = new HashMap<>(); /* мапа множеств друзей пользователя */
+    private final Map<Long, Set<Film>> likedFilmIds = new HashMap<>(); /* мапа понравившихся фильмов */
     private final IdGenerator idGenerator = new IdGenerator();
 
     @Override
@@ -23,18 +24,25 @@ public class InMemoryUserStorage implements UserStorage{
     public User addUser(User user) {
         user.setId(idGenerator.getId());
         users.put(user.getId(), user);
-        log.info("Получен POST запрос к эндпоинту /{}s, успешно обработан.\n" +
-                        "В базу добавлен пользователь: '{}' с id: '{}'.", user.getDataType().toString().toLowerCase(Locale.ROOT),
-                user.getName(), user.getId());
         return user;
     }
 
     @Override
     public User updateUser(User user) {
         users.put(user.getId(), user);
-        log.info("Получен PUT запрос к эндпоинту: /{}s, успешно обработан.\n" +
-                        "В базе обновлен пользователь: '{}' с id: '{}'.", user.getDataType().toString().toLowerCase(Locale.ROOT),
-                user.getName(), user.getId());
         return user;
+    }
+
+    @Override
+    public void addFriend(long userId, long friendId) {
+        if (!userFriendIds.containsKey(userId)) { /* если множество друзей еще не создано */
+            userFriendIds.put(userId, new HashSet<>()); /* то создаем */
+        }
+        userFriendIds.get(userId).add(users.get(friendId));
+    }
+
+    @Override
+    public void removeFriend(long userId, long friendId) {
+        userFriendIds.get(userId).remove(users.get(friendId));
     }
 }

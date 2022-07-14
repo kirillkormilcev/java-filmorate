@@ -12,11 +12,11 @@ import java.time.LocalDate;
 /**
  * класс фильма
  */
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(of="id")
 @Data
 @Builder
-public class Film{
-    private int id;
+public class Film {
+    private long id;
     @NotNull
     @NotBlank
     private final String name;
@@ -24,4 +24,5 @@ public class Film{
     private final LocalDate releaseDate;
     private final int duration;
     private final DataType dataType = DataType.FILM;
+    private long likesCount;
 }

@@ -1,18 +1,25 @@
 package ru.yandex.practikum.filmorate.storage;
 
 import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.yandex.practikum.filmorate.model.film.Film;
+import ru.yandex.practikum.filmorate.model.user.User;
 
 import java.util.*;
 
 @Component
-@Slf4j
 @Getter
-public class InMemoryFilmStorage implements FilmStorage{
-    private final Map<Integer, Film> films = new LinkedHashMap<>();
+public class InMemoryFilmStorage implements FilmStorage {
+    private final Map<Long, Film> films = new LinkedHashMap<>(); /* мапа фильмов */
+    private final Map<Long, Set<User>> likeIds = new HashMap<>(); /* мапа множеств лайкнувших пользователей */
     private final IdGenerator idGenerator = new IdGenerator();
+    private final UserStorage userStorage;
+
+    @Autowired
+    public InMemoryFilmStorage(UserStorage userStorage) {
+        this.userStorage = userStorage;
+    }
 
     @Override
     public List<Film> getListOfFilms() {
@@ -23,18 +30,25 @@ public class InMemoryFilmStorage implements FilmStorage{
     public Film addFilm(Film film) {
         film.setId(idGenerator.getId());
         films.put(film.getId(), film);
-        log.info("Получен POST запрос к эндпоинту /{}s, успешно обработан.\n" +
-                        "В базу добавлен фильм: '{}' с id: '{}'.", film.getDataType().toString().toLowerCase(Locale.ROOT),
-                film.getName(), film.getId());
         return film;
     }
 
     @Override
     public Film updateFilm(Film film) {
         films.put(film.getId(), film);
-        log.info("Получен PUT запрос к эндпоинту: /{}s, успешно обработан.\n" +
-                        "В базе обновлен фильм: '{}' с id: '{}'.", film.getDataType().toString().toLowerCase(Locale.ROOT),
-                film.getName(), film.getId());
         return film;
+    }
+
+    @Override
+    public void addLikeUserToFilm(long filmId, long userId) {
+        if (!likeIds.containsKey(filmId)) { /* если множество лайкнувших пользователей еще не создано */
+            likeIds.put(filmId, new HashSet<>()); /* то создаем */
+        }
+        likeIds.get(filmId).add(userStorage.getUsers().get(userId));
+    }
+
+    @Override
+    public void removeLikeUserFromFilm(long filmId, long userId) {
+        likeIds.get(filmId).remove(userStorage.getUsers().get(userId));
     }
 }

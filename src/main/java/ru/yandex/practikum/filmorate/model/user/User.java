@@ -13,11 +13,11 @@ import java.time.LocalDate;
 /**
  * класс пользователя
  */
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(of="id")
 @Data
 @Builder
-public class User{
-    private int id;
+public class User {
+    private long id;
     @NotNull
     @NotBlank
     @Email
@@ -28,4 +28,5 @@ public class User{
     private String name;
     private LocalDate birthday;
     private final DataType dataType = DataType.USER;
+    private long friendsCount;
 }
