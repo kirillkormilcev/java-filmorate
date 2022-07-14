@@ -4,15 +4,10 @@ import org.junit.jupiter.api.Test;
 import ru.yandex.practikum.filmorate.exception.UserValidationException;
 import ru.yandex.practikum.filmorate.model.user.User;
 import ru.yandex.practikum.filmorate.storage.InMemoryUserStorage;
-import ru.yandex.practikum.filmorate.storage.UserStorage;
 
-import java.time.Duration;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -26,48 +21,48 @@ class UserServiceTest {
             .build();
     User user2 = User.builder()
             .email("jkgjg@ssh.ru")
-            .login("hkjhkjh")
-            .name("Пплополо")
+            .login("hello")
+            .name("Половинка")
             .birthday(LocalDate.of(1981,2,4))
             .build();
     User userWithSpacesInLogin = User.builder()
             .email("jkgjg@ssfdgsh.ru")
-            .login("hkjh kjh")
-            .name("Пплопарроло")
+            .login("hello gay")
+            .name("Половник")
             .birthday(LocalDate.of(1980,2,4))
             .build();
     User userEmptyName = User.builder()
             .email("jkdfgjg@ssfdgsh.ru")
-            .login("jhfkjh")
+            .login("Hermitage")
             .name(" ")
             .birthday(LocalDate.of(1979,2,4))
             .build();
 
     User userFutureBirthdate = User.builder()
             .email("jkdfjhgjg@ssfdgsh.ru")
-            .login("jhfkbmnjh")
-            .name("ырыпароапыр")
+            .login("Sorbonne")
+            .name("Главная рыба")
             .birthday(LocalDate.of(1079,2,4))
             .build();
 
     User userWithExistEmail1 = User.builder()
             .email("hggjgkjmn@ioyure.ru")
-            .login("glkglkg")
-            .name("лоплпп")
+            .login("Glock")
+            .name("Лолита")
             .birthday(LocalDate.of(1962,2,4))
             .build();
 
     User userWithExistEmail2 = User.builder()
             .email("hgasdfgdfgjgkjmn@ioyure.ru")
-            .login("glsddkdfgglkg")
-            .name("лопвываалпп")
+            .login("response")
+            .name("Лолита Милявская")
             .birthday(LocalDate.of(1942,2,4))
             .build();
 
     User userWithExistEmail3 = User.builder()
             .email("hggjgkjmn@ioyure.ru")
-            .login("glsddkglkg")
-            .name("лопвыалпп")
+            .login("entity")
+            .name("Валидол")
             .birthday(LocalDate.of(1952,2,4))
             .build();
 
@@ -83,7 +78,7 @@ class UserServiceTest {
         try {
             userService.addUserToStorage(userWithSpacesInLogin);
         } catch (UserValidationException e) {
-            assertEquals("В логине hkjh kjh присутствуют пробелы.", e.getMessage());
+            assertEquals("В логине hello gay присутствуют пробелы.", e.getMessage());
         }
     }
 
@@ -112,7 +107,7 @@ class UserServiceTest {
         try {
             userService.updateUserInStorage(userFutureBirthdate);
         } catch (UserValidationException e) {
-            assertEquals("Не корректная дата рождения: 2022-07-16 у пользователя: jhfkbmnjh.", e.getMessage());
+            assertEquals("Не корректная дата рождения: 2022-07-16 у пользователя: Sorbonne.", e.getMessage());
         }
     }
 

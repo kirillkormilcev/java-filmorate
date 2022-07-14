@@ -24,21 +24,21 @@ public class ErrorHandler {
     @ExceptionHandler
     public ResponseEntity<ErrorResponse> handleFilmValidationException(final FilmValidationException e) {
         log.warn(e.getMessage());
-        return new ResponseEntity<>( new ErrorResponse("Не корректно(-ы)е поле(-я) фильма.", e.getMessage()),
+        return new ResponseEntity<>(new ErrorResponse("Не корректно(-ы)е поле(-я) фильма.", e.getMessage()),
                 HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler
     public ResponseEntity<ErrorResponse> handleUserValidationException(final UserValidationException e) {
         log.warn(e.getMessage());
-        return new ResponseEntity<>( new ErrorResponse("Не корректно(-ы)е поле(-я) пользователя.", e.getMessage()),
+        return new ResponseEntity<>(new ErrorResponse("Не корректно(-ы)е поле(-я) пользователя.", e.getMessage()),
                 HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler
     public ResponseEntity<ErrorResponse> handleIncorrectRequestParamException(final IncorrectRequestParamException e) {
         log.warn(e.getMessage());
-        return new ResponseEntity<>( new ErrorResponse("Не корректный параметр запроса.", e.getMessage()),
+        return new ResponseEntity<>(new ErrorResponse("Не корректный параметр запроса.", e.getMessage()),
                 HttpStatus.BAD_REQUEST);
     }
 }

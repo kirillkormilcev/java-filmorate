@@ -103,9 +103,9 @@ public class FilmService {
     public List<Film> getPopularOrTenFirstFilms(Integer count) {
         if (count < 0) {
             throw new IncorrectRequestParamException("Передано отрицательное количество лайков у фильма");
-        } else  {
+        } else {
             final Comparator<Film> comparatorSortByLikeCount = (o1, o2) -> { /* компаратор сортировки по количеству лайков */
-                 if (o2.getLikesCount() > o1.getLikesCount()) {
+                if (o2.getLikesCount() > o1.getLikesCount()) {
                     return 1;
                 } else if (o2.getLikesCount() < o1.getLikesCount()) {
                     return -1;
