@@ -107,7 +107,7 @@ class UserServiceTest {
         try {
             userService.updateUserInStorage(userFutureBirthdate);
         } catch (UserValidationException e) {
-            assertEquals("Не корректная дата рождения: 2022-07-16 у пользователя: Sorbonne.", e.getMessage());
+            assertEquals("Не корректная дата рождения: " + LocalDate.now().plusDays(2) + " у пользователя: Sorbonne.", e.getMessage());
         }
     }
 
