@@ -3,6 +3,7 @@ package ru.yandex.practikum.filmorate.service;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practikum.filmorate.exception.NotFoundException;
 import ru.yandex.practikum.filmorate.exception.UserValidationException;
@@ -23,7 +24,7 @@ public class UserService {
     private final UserStorage userStorage;
 
     @Autowired
-    public UserService(UserStorage userStorage) {
+    public UserService(@Qualifier UserStorage userStorage) {
         this.userStorage = userStorage;
     }
 
@@ -39,7 +40,7 @@ public class UserService {
      */
     public User getUserById(Long userId) {
         checkUserId(userId);
-        return userStorage.getUsers().get(userId);
+        return userStorage.getUserById(userId);
     }
 
     /**
@@ -49,7 +50,6 @@ public class UserService {
         userValidation(user);
         userStorage.addUser(user);
         return user;
-
     }
 
     /**
@@ -66,14 +66,12 @@ public class UserService {
      * добавить друга пользователю
      */
     public User addFriendToUser(long userId, long friendId) {
+        if (userId == friendId) {
+            throw new UserValidationException("Нельзя дружить с самим собой)!");
+        }
         checkUserId(userId);
         checkUserId(friendId);
         userStorage.addFriend(userId, friendId); /* добавить друга пользователю */
-        userStorage.addFriend(friendId, userId); /* добавить пользователя другу */
-        getUserById(userId).setFriendsCount(userStorage.getUserFriendIds().get(userId).size());
-        /* обновить количество друзей пользователя*/
-        getUserById(friendId).setFriendsCount(userStorage.getUserFriendIds().get(friendId).size());
-        /* обновить количество друзей у друга*/
         return getUserById(userId);
     }
 
@@ -81,14 +79,12 @@ public class UserService {
      * удалить друга у пользователя
      */
     public User removeFriendFromUser(long userId, long friendId) {
+        if (userId == friendId) {
+            throw new UserValidationException("Ссориться с самим собой - плохая идея!");
+        }
         checkUserId(userId);
         checkUserId(friendId);
         userStorage.removeFriend(userId, friendId); /* удалить друга у пользователя */
-        userStorage.removeFriend(friendId, userId); /* удалить пользователя у друга */
-        getUserById(userId).setFriendsCount(userStorage.getUserFriendIds().get(userId).size());
-        /* обновить количество друзей */
-        getUserById(friendId).setFriendsCount(userStorage.getUserFriendIds().get(friendId).size());
-        /* обновить количество друзей у друга*/
         return getUserById(userId);
     }
 
@@ -97,19 +93,16 @@ public class UserService {
      */
     public Set<User> getFriendsByUserId(long userId) {
         checkUserId(userId);
-        if (!userStorage.getUserFriendIds().containsKey(userId)) { /* если множество друзей еще не создано в мапе*/
-            return new HashSet<>(); /* то вернуть пустое множество */
-        } else {
-            return userStorage.getUserFriendIds().get(userId);
-        }
+        return userStorage.getUserFriends(userId);
     }
 
     /**
      * общие друзья двух пользователей
      */
     public List<User> getCommonFriends(long userId, long otherId) {
-        checkUserId(userId);
-        checkUserId(otherId);
+        if (userId == otherId) {
+            throw new UserValidationException("Общие друзья себя самого?! Однако!");
+        }
         Set<User> commonUserFriends = new HashSet<>(getFriendsByUserId(userId)); /* множество друзей пользователя */
         Set<User> otherFriends = new HashSet<>(getFriendsByUserId(otherId)); /* множество друзей другого пользователя */
         commonUserFriends.retainAll(otherFriends); /* пересечение этих множеств (общие друзья) */
@@ -121,21 +114,21 @@ public class UserService {
     }
 
     /**
-     * проверка пользователя
+     * проверка входных полей пользователя
      */
     private void userValidation(User user) {
         if (user.getLogin().contains(" ")) {
             throw new UserValidationException("В логине " + user.getLogin() + " присутствуют пробелы.");
         }
         if (user.getName().trim().isBlank()) {
-            log.info("Пользователю с логином: '{}' назначено аналогичное имя.", user.getLogin()); //TODO надо ли?
+            log.info("Пользователю с логином: '{}' назначено аналогичное имя.", user.getLogin());
             user.setName(user.getLogin());
         }
         if (user.getBirthday().isAfter(LocalDate.now())) {
             throw new UserValidationException("Не корректная дата рождения: " + user.getBirthday() + " у пользователя: "
                     + user.getLogin() + ".");
         }
-        for (User userAvailable : userStorage.getUsers().values()) {
+        for (User userAvailable : userStorage.getListOfUsers()) {
             if (user.getEmail().equals(userAvailable.getEmail())) {
                 if (userAvailable.getId() == user.getId()) {
                     return;
@@ -151,7 +144,7 @@ public class UserService {
      * проверка наличия id пользователя в базе
      */
     private void checkUserId(long userId) {
-        if (!userStorage.getUsers().containsKey(userId)) {
+        if (!userStorage.getAllUserIds().contains(userId)) {
             throw new NotFoundException("Пользователя с индексом: " + userId + " нет в базе пользователей.");
         }
     }

@@ -1,19 +1,20 @@
 package ru.yandex.practikum.filmorate.model.film;
 
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 import ru.yandex.practikum.filmorate.model.DataType;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
+import java.util.Set;
 
 /**
  * класс фильма
  */
-@EqualsAndHashCode(of="id")
-@Data
+@EqualsAndHashCode(of = "id")
+@Getter
+@Setter
+@AllArgsConstructor
 @Builder
 public class Film {
     private long id;
@@ -24,7 +25,7 @@ public class Film {
     private final LocalDate releaseDate;
     private final int duration;
     private final DataType dataType = DataType.FILM;
-    private long likesCount;
-    private final long genreId;
-    private final long ratingId;
+    private int likesRating;
+    private MPA MPA;
+    private final Set<Genre> genres;
 }

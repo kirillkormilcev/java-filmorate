@@ -13,7 +13,7 @@ import java.time.LocalDate;
 /**
  * класс пользователя
  */
-@EqualsAndHashCode(of="id")
+@EqualsAndHashCode(of = "id")
 @Data
 @Builder
 public class User {

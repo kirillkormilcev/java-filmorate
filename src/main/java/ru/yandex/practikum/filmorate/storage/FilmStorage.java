@@ -1,7 +1,7 @@
 package ru.yandex.practikum.filmorate.storage;
 
 import ru.yandex.practikum.filmorate.model.film.Film;
-import ru.yandex.practikum.filmorate.model.user.User;
+import ru.yandex.practikum.filmorate.model.film.Genre;
 
 import java.util.*;
 
@@ -11,6 +11,11 @@ public interface FilmStorage {
      * список всех фильмов
      */
     List<Film> getListOfFilms();
+
+    /**
+     * получить фильм по id
+     */
+    Film getFilmById(long id);
 
     /**
      * добавить фильм
@@ -23,24 +28,13 @@ public interface FilmStorage {
     Film updateFilm(Film film);
 
     /**
-     * добавить лайк
+     * список id всех фильмов
      */
-    void addLikeUserToFilm(long filmId, long userId);
+    List<Long> getAllFilmIds();
 
     /**
-     * удалить лайк
+     * список id жанров фильма по его id
      */
-    void removeLikeUserFromFilm(long filmId, long userId);
-
-    /**
-     * геттер мапы фильмов
-     */
-    Map<Long, Film> getFilms();
-
-    /**
-     * геттер лайков фильма
-     */
-    Map<Long, Set<User>> getLikeIds();
-
+    List<Genre> getGenresByFilmId(long id);
 }
 
