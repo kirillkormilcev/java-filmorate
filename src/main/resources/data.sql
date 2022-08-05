@@ -12,3 +12,7 @@ merge into MPA_RATINGS (MPA_RATING_ID, RATING_NAME, DESCRIPTION)
     (3, 'PG-13', 'Детям до 13 лет просмотр не желателен.'),
     (4, 'R', 'Лицам до 17 лет просматривать фильм можно только в присутствии взрослого.'),
     (5, 'NC-17', 'Лицам до 18 лет просмотр запрещён.');
+
+merge into USERS (USER_ID, USER_NAME, LOGIN, EMAIL, BIRTHDAY, FRIENDS_COUNT)
+    values (1, 'Кирилл', 'Kirill', 'kirill@kormilcev.ru', '1982-02-04', 56),
+    (2, 'Евгения', 'Evgeniya', 'evgenia@dedyuhina.ru', '1979-09-02', 36);

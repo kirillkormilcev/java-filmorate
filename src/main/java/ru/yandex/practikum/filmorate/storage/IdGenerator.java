@@ -6,7 +6,7 @@ import lombok.Setter;
 public class IdGenerator {
     private long id = 1L;
 
-    protected IdGenerator() {
+    public IdGenerator() {
     }
 
     public long getId() {

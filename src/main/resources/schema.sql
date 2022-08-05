@@ -29,7 +29,7 @@ create table if not exists FILMS (
         foreign key (MPA_RATING_ID) references MPA_RATINGS
 );
 
-create unique index FILMS_NAME_UNQ
+create unique index if not exists FILMS_NAME_UNQ
     on FILMS (FILM_NAME);
 
 create table if not exists FILM_GENRES (
@@ -44,7 +44,7 @@ create table if not exists FILM_GENRES (
         foreign key (GENRE_ID) references GENRES
 );
 
-alter table FILMS add constraint FILM_GENRES_FK
+alter table FILMS add constraint if not exists FILM_GENRES_FK
     foreign key (FILM_GENRES_ID) references FILM_GENRES;
 
 create table if not exists USERS (
@@ -58,10 +58,10 @@ create table if not exists USERS (
         primary key (USER_ID)
 );
 
-create unique index USERS_EMAIL_UNQ
+create unique index if not exists USERS_EMAIL_UNQ
     on USERS (EMAIL);
 
-create unique index USERS_LOGIN_UNQ
+create unique index if not exists USERS_LOGIN_UNQ
     on USERS (LOGIN);
 
 create table if not exists LIKES (

@@ -3,7 +3,7 @@ package ru.yandex.practikum.filmorate.service;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practikum.filmorate.exception.UserValidationException;
 import ru.yandex.practikum.filmorate.model.user.User;
-import ru.yandex.practikum.filmorate.storage.InMemoryUserStorage;
+import ru.yandex.practikum.filmorate.storage.impl.InMemoryUserStorage;
 
 import java.time.LocalDate;
 import java.util.ArrayList;

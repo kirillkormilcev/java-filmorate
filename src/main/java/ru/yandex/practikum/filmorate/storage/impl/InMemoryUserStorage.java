@@ -1,13 +1,15 @@
-package ru.yandex.practikum.filmorate.storage;
+package ru.yandex.practikum.filmorate.storage.impl;
 
 import lombok.Getter;
 import org.springframework.stereotype.Component;
 import ru.yandex.practikum.filmorate.model.film.Film;
 import ru.yandex.practikum.filmorate.model.user.User;
+import ru.yandex.practikum.filmorate.storage.IdGenerator;
+import ru.yandex.practikum.filmorate.storage.UserStorage;
 
 import java.util.*;
 
-@Component
+@Component("InMemoryUserStorage")
 @Getter
 public class InMemoryUserStorage implements UserStorage {
     private final Map<Long, User> users = new LinkedHashMap<>(); /* мапа пользователей */

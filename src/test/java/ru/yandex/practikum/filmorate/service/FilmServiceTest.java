@@ -4,8 +4,8 @@ import org.junit.jupiter.api.Test;
 import ru.yandex.practikum.filmorate.exception.FilmValidationException;
 import ru.yandex.practikum.filmorate.model.film.Film;
 import ru.yandex.practikum.filmorate.model.user.User;
-import ru.yandex.practikum.filmorate.storage.InMemoryFilmStorage;
-import ru.yandex.practikum.filmorate.storage.InMemoryUserStorage;
+import ru.yandex.practikum.filmorate.storage.impl.InMemoryFilmStorage;
+import ru.yandex.practikum.filmorate.storage.impl.InMemoryUserStorage;
 import ru.yandex.practikum.filmorate.storage.UserStorage;
 
 import java.time.LocalDate;

@@ -2,6 +2,7 @@ package ru.yandex.practikum.filmorate.service;
 
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practikum.filmorate.exception.FilmValidationException;
 import ru.yandex.practikum.filmorate.exception.IncorrectRequestParamException;
@@ -23,7 +24,7 @@ public class FilmService {
     private final UserStorage userStorage;
 
     @Autowired
-    public FilmService(FilmStorage filmStorage, UserStorage userStorage) {
+    public FilmService(@Qualifier FilmStorage filmStorage, @Qualifier UserStorage userStorage) {
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
     }
