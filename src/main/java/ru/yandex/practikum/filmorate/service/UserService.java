@@ -39,8 +39,8 @@ public class UserService {
      * пользователь по Id
      */
     public User getUserById(Long userId) {
-        checkUserId(userId);
-        return userStorage.getUsers().get(userId);
+        //checkUserId(userId);
+        return userStorage.getUserById(userId);
     }
 
     /**
@@ -136,7 +136,7 @@ public class UserService {
             throw new UserValidationException("Не корректная дата рождения: " + user.getBirthday() + " у пользователя: "
                     + user.getLogin() + ".");
         }
-        for (User userAvailable : userStorage.getUsers().values()) {
+        for (User userAvailable : userStorage.getListOfUsers()) {
             if (user.getEmail().equals(userAvailable.getEmail())) {
                 if (userAvailable.getId() == user.getId()) {
                     return;
@@ -152,6 +152,7 @@ public class UserService {
      * проверка наличия id пользователя в базе
      */
     private void checkUserId(long userId) {
+
         if (!userStorage.getUsers().containsKey(userId)) {
             throw new NotFoundException("Пользователя с индексом: " + userId + " нет в базе пользователей.");
         }

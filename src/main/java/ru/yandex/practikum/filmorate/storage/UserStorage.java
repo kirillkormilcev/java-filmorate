@@ -8,17 +8,23 @@ import java.util.*;
 public interface UserStorage {
 
     /**
-     * список всех фильмов
+     * список всех пользователей
      */
     List<User> getListOfUsers();
 
     /**
-     * добавить фильм
+     * найти пользователя по id
+     */
+    User getUserById(long id);
+
+
+    /**
+     * добавить пользователя
      */
     User addUser(User user);
 
     /**
-     * обновить фильм
+     * обновить пользователя
      */
     User updateUser(User user);
 
