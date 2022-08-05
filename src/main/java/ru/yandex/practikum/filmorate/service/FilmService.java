@@ -76,7 +76,7 @@ public class FilmService {
         } /* если в мапе еще не множества фильмов пролайканых пользователем, то создать */
         userStorage.getLikedFilmIds().get(userId).add(filmStorage.getFilms().get(filmId));
         /* добавить понравившийся фильм пользователю */
-        getFilmById(filmId).setLikesCount(filmStorage.getLikeIds().get(filmId).size());
+        getFilmById(filmId).setLikesRating(filmStorage.getLikeIds().get(filmId).size());
         /* обновить количество лайков у фильма */
         return filmStorage.getFilms().get(filmId);
     }
@@ -92,7 +92,7 @@ public class FilmService {
         filmStorage.removeLikeUserFromFilm(filmId, userId); /* удалить лайкнувшего пользователя у фильма */
         userStorage.getLikedFilmIds().get(userId).remove(filmStorage.getFilms().get(filmId));
         /* удалить понравившийся фильм у пользователя */
-        getFilmById(filmId).setLikesCount(filmStorage.getLikeIds().get(filmId).size());
+        getFilmById(filmId).setLikesRating(filmStorage.getLikeIds().get(filmId).size());
         /* обновить количество лайков у фильма */
         return filmStorage.getFilms().get(filmId);
     }
@@ -105,9 +105,9 @@ public class FilmService {
             throw new IncorrectRequestParamException("Передано отрицательное количество лайков у фильма");
         } else {
             final Comparator<Film> comparatorSortByLikeCount = (o1, o2) -> { /* компаратор сортировки по количеству лайков */
-                if (o2.getLikesCount() > o1.getLikesCount()) {
+                if (o2.getLikesRating() > o1.getLikesRating()) {
                     return 1;
-                } else if (o2.getLikesCount() < o1.getLikesCount()) {
+                } else if (o2.getLikesRating() < o1.getLikesRating()) {
                     return -1;
                 } else {
                     return (int) (o1.getId() - o2.getId()); /* при равных лайках по id */

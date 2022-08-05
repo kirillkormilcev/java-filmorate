@@ -24,7 +24,7 @@ public class Film {
     private final LocalDate releaseDate;
     private final int duration;
     private final DataType dataType = DataType.FILM;
-    private long likesCount;
+    private long likesRating;
     private final long filmGenresId;
-    private final long ratingId;
+    private final long MPARatingId;
 }

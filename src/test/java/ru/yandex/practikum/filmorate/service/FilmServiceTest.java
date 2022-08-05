@@ -200,11 +200,11 @@ class FilmServiceTest {
         filmService.addLikeToFilm(3, 3);
         filmService.addLikeToFilm(5, 2);
 
-        assertEquals(1, filmService.getFilmById(1L).getLikesCount());
-        assertEquals(0, filmService.getFilmById(2L).getLikesCount());
-        assertEquals(2, filmService.getFilmById(3L).getLikesCount());
-        assertEquals(3, filmService.getFilmById(4L).getLikesCount());
-        assertEquals(1, filmService.getFilmById(5L).getLikesCount());
+        assertEquals(1, filmService.getFilmById(1L).getLikesRating());
+        assertEquals(0, filmService.getFilmById(2L).getLikesRating());
+        assertEquals(2, filmService.getFilmById(3L).getLikesRating());
+        assertEquals(3, filmService.getFilmById(4L).getLikesRating());
+        assertEquals(1, filmService.getFilmById(5L).getLikesRating());
 
         assertEquals(film4, filmService.getPopularOrTenFirstFilms(5).get(0));
         assertEquals(film3, filmService.getPopularOrTenFirstFilms(5).get(1));
@@ -220,11 +220,11 @@ class FilmServiceTest {
         filmService.removeLikeFromFilm(3, 2);
         filmService.removeLikeFromFilm(3, 3);
 
-        assertEquals(1, filmService.getFilmById(1L).getLikesCount());
-        assertEquals(0, filmService.getFilmById(2L).getLikesCount());
-        assertEquals(0, filmService.getFilmById(3L).getLikesCount());
-        assertEquals(3, filmService.getFilmById(4L).getLikesCount());
-        assertEquals(1, filmService.getFilmById(5L).getLikesCount());
+        assertEquals(1, filmService.getFilmById(1L).getLikesRating());
+        assertEquals(0, filmService.getFilmById(2L).getLikesRating());
+        assertEquals(0, filmService.getFilmById(3L).getLikesRating());
+        assertEquals(3, filmService.getFilmById(4L).getLikesRating());
+        assertEquals(1, filmService.getFilmById(5L).getLikesRating());
 
         assertEquals(film4, filmService.getPopularOrTenFirstFilms(5).get(0));
         assertEquals(film1, filmService.getPopularOrTenFirstFilms(5).get(1));
