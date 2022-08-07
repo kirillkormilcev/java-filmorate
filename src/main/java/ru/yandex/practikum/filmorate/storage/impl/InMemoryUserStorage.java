@@ -54,6 +54,11 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
+    public Set<User> getUserFriendIds(long id) {
+        return null;
+    }
+
+    @Override
     public List<Long> getAllUserIds() {
         return null;
     }

@@ -50,7 +50,6 @@ public class UserService {
         userValidation(user);
         userStorage.addUser(user);
         return user;
-
     }
 
     /**
@@ -67,14 +66,18 @@ public class UserService {
      * добавить друга пользователю
      */
     public User addFriendToUser(long userId, long friendId) {
+        if (userId == friendId) {
+            throw new UserValidationException("Нельзя дружить с самим собой)!");
+        }
         checkUserId(userId);
         checkUserId(friendId);
         userStorage.addFriend(userId, friendId); /* добавить друга пользователю */
-        userStorage.addFriend(friendId, userId); /* добавить пользователя другу */
-        getUserById(userId).setFriendsCount(userStorage.getUserFriendIds().get(userId).size());
-        /* обновить количество друзей пользователя*/
-        getUserById(friendId).setFriendsCount(userStorage.getUserFriendIds().get(friendId).size());
-        /* обновить количество друзей у друга*/
+        //userStorage.addFriend(friendId, userId); /* добавить пользователя другу */ //todo оставлю на случай если
+        // todo не нужно подтверждение дружбы
+        //getUserById(userId).setFriendsCount(userStorage.getUserFriendIds().get(userId).size());
+        /* обновить количество друзей пользователя*/ //todo доделать после того как все методы будут переделаны на бд
+        //getUserById(friendId).setFriendsCount(userStorage.getUserFriendIds().get(friendId).size());
+        /* обновить количество друзей у друга*/ //todo доделать после того как все методы будут переделаны на бд
         return getUserById(userId);
     }
 
@@ -82,14 +85,18 @@ public class UserService {
      * удалить друга у пользователя
      */
     public User removeFriendFromUser(long userId, long friendId) {
+        if (userId == friendId) {
+            throw new UserValidationException("Ссориться с самим собой - плохая идея!");
+        }
         checkUserId(userId);
         checkUserId(friendId);
         userStorage.removeFriend(userId, friendId); /* удалить друга у пользователя */
-        userStorage.removeFriend(friendId, userId); /* удалить пользователя у друга */
-        getUserById(userId).setFriendsCount(userStorage.getUserFriendIds().get(userId).size());
-        /* обновить количество друзей */
-        getUserById(friendId).setFriendsCount(userStorage.getUserFriendIds().get(friendId).size());
-        /* обновить количество друзей у друга*/
+        //userStorage.removeFriend(friendId, userId); /* удалить пользователя у друга */ //todo оставлю на случай если
+        // todo не нужно подтверждение дружбы
+        //getUserById(userId).setFriendsCount(userStorage.getUserFriendIds().get(userId).size());
+        /* обновить количество друзей */ //todo доделать после того как все методы будут переделаны на бд
+        //getUserById(friendId).setFriendsCount(userStorage.getUserFriendIds().get(friendId).size());
+        /* обновить количество друзей у друга*/ //todo доделать после того как все методы будут переделаны на бд
         return getUserById(userId);
     }
 
@@ -98,17 +105,16 @@ public class UserService {
      */
     public Set<User> getFriendsByUserId(long userId) {
         checkUserId(userId);
-        if (!userStorage.getUserFriendIds().containsKey(userId)) { /* если множество друзей еще не создано в мапе*/
-            return new HashSet<>(); /* то вернуть пустое множество */
-        } else {
-            return userStorage.getUserFriendIds().get(userId);
-        }
+        return userStorage.getUserFriendIds(userId);
     }
 
     /**
      * общие друзья двух пользователей
      */
     public List<User> getCommonFriends(long userId, long otherId) {
+        if (userId == otherId) {
+            throw new UserValidationException("Общие друзья себя самого?! Однако!");
+        }
         checkUserId(userId);
         checkUserId(otherId);
         Set<User> commonUserFriends = new HashSet<>(getFriendsByUserId(userId)); /* множество друзей пользователя */
