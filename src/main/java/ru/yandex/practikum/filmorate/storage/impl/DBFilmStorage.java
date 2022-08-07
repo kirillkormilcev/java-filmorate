@@ -88,13 +88,11 @@ public class DBFilmStorage implements FilmStorage {
     }
 
     @Override
-    public void addLikeUserToFilm(long filmId, long userId) {
-
+    public void addLikeUserToFilm(long filmId, long userId) { // добавить метод обновления лайков в таблице фильмов
     }
 
     @Override
-    public void removeLikeUserFromFilm(long filmId, long userId) {
-
+    public void removeLikeUserFromFilm(long filmId, long userId) { // добавить метод обновления лайков в таблице фильмов
     }
 
     @Override
@@ -125,14 +123,23 @@ public class DBFilmStorage implements FilmStorage {
                     .releaseDate(rs.getDate("RELEASE_DATE").toLocalDate())
                     .duration(rs.getInt("DURATION"))
                     .likesRating(rs.getLong("LIKES_RATING"))
-                    //todo взять из таблицы фильмов, не забыть это значение там обновлять
-                    .filmGenresId(new ArrayList<>())
-                    //todo взять из таблицы жанров фильмов, не забыть это значение там обновлять
+                    //todo взять из таблицы фильмов, не забыть это значение там обновлять (будет в лайках)
+                    .filmGenresId(getGenreIdsByFilmId(rs.getLong("FILM_ID")))
+                    //todo взять из таблицы жанров фильмов, не забыть это значение там обновлять (есть при обновлении фильма)
                     .MPARatingId(rs.getLong("MPA_RATING_ID"))
-                    //todo взять из таблицы фильмов, не забыть это значение там обновлять
+                    //todo взять из таблицы фильмов, не забыть это значение там обновлять (обновляется только при обновлении фильма)
                     .build();
         } catch (SQLException | RuntimeException e) { // TODO правильный ли отлов ошибок
             throw new CustomSQLException("Ошибка при создании фильма из строки БД.");
         }
+    }
+
+    /**
+     * список id жанров фильма по его id
+     */
+    private List<Long> getGenreIdsByFilmId(long id) {
+        String sqlSelect = "select GENRE_ID from FILM_GENRES " +
+                "where FILM_ID = ?";
+        return jdbcTemplate.queryForList(sqlSelect, Long.class, id);
     }
 }
