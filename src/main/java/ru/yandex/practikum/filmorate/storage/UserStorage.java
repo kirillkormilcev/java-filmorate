@@ -52,5 +52,8 @@ public interface UserStorage {
      * геттер мапы пролайканых фильмов пользователя
      */
     Map<Long, Set<Film>> getLikedFilmIds();
+
+    /** получить id всех пользователей*/
+    List<Long> getAllUserIds();
 }
 

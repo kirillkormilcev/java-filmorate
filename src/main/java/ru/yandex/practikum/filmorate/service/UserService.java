@@ -39,7 +39,7 @@ public class UserService {
      * пользователь по Id
      */
     public User getUserById(Long userId) {
-        //checkUserId(userId);
+        checkUserId(userId);
         return userStorage.getUserById(userId);
     }
 
@@ -152,8 +152,7 @@ public class UserService {
      * проверка наличия id пользователя в базе
      */
     private void checkUserId(long userId) {
-
-        if (!userStorage.getUsers().containsKey(userId)) {
+        if (!userStorage.getAllUserIds().contains(userId)) {
             throw new NotFoundException("Пользователя с индексом: " + userId + " нет в базе пользователей.");
         }
     }

@@ -42,7 +42,7 @@ public class ErrorHandler {
     @ExceptionHandler
     public ResponseEntity<ErrorResponse> handleSQLException(final CustomSQLException e) {
         log.warn(e.getMessage());
-        return new ResponseEntity<>(new ErrorResponse("Проблема SQL.", e.getMessage()),
+        return new ResponseEntity<>(new ErrorResponse("Проблема в SQL, БД.", e.getMessage()),
                 HttpStatus.BAD_REQUEST);
     }
 }
