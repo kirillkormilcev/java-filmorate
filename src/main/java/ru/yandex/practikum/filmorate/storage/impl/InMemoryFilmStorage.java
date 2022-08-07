@@ -31,6 +31,11 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
+    public Film getFilmById(long id) {
+        return null;
+    } // заглушка реализации в БД
+
+    @Override
     public Film addFilm(Film film) {
         film.setId(idGenerator.getId());
         films.put(film.getId(), film);
@@ -55,4 +60,9 @@ public class InMemoryFilmStorage implements FilmStorage {
     public void removeLikeUserFromFilm(long filmId, long userId) {
         likeIds.get(filmId).remove(userStorage.getUsers().get(userId));
     }
+
+    @Override
+    public List<Long> getAllFilmIds() {
+        return null;
+    } // заглушка реализации в БД
 }

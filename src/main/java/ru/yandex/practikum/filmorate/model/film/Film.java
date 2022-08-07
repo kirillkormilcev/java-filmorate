@@ -8,6 +8,7 @@ import ru.yandex.practikum.filmorate.model.DataType;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
+import java.util.List;
 
 /**
  * класс фильма
@@ -25,6 +26,6 @@ public class Film {
     private final int duration;
     private final DataType dataType = DataType.FILM;
     private long likesRating;
-    private final long filmGenresId;
+    private List<Long> filmGenresId;
     private final long MPARatingId;
 }

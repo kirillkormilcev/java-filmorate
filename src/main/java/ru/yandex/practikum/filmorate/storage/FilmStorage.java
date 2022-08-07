@@ -13,6 +13,11 @@ public interface FilmStorage {
     List<Film> getListOfFilms();
 
     /**
+     * получить фильм по id
+     */
+    public Film getFilmById(long id);
+
+    /**
      * добавить фильм
      */
     Film addFilm(Film film);
@@ -31,6 +36,11 @@ public interface FilmStorage {
      * удалить лайк
      */
     void removeLikeUserFromFilm(long filmId, long userId);
+
+    /**
+     * список id всех фильмов
+     */
+    public List<Long> getAllFilmIds();
 
     /**
      * геттер мапы фильмов

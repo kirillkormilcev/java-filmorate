@@ -123,7 +123,7 @@ public class UserService {
             throw new UserValidationException("В логине " + user.getLogin() + " присутствуют пробелы.");
         }
         if (user.getName().trim().isBlank()) {
-            log.info("Пользователю с логином: '{}' назначено аналогичное имя.", user.getLogin()); //TODO надо ли?
+            log.info("Пользователю с логином: '{}' назначено аналогичное имя.", user.getLogin());
             user.setName(user.getLogin());
         }
         if (user.getBirthday().isAfter(LocalDate.now())) {

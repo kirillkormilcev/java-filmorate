@@ -9,8 +9,10 @@ import ru.yandex.practikum.filmorate.model.film.Film;
 import ru.yandex.practikum.filmorate.model.user.User;
 import ru.yandex.practikum.filmorate.storage.FilmStorage;
 
+import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -24,19 +26,65 @@ public class DBFilmStorage implements FilmStorage {
 
     @Override
     public List<Film> getListOfFilms() {
-        String sqlSelect = "select FILM_ID, FILM_NAME, DESCRIPTION, DURATION, LIKES_RATING, FILM_GENRES_ID, " +
+        String sqlSelect = "select FILM_ID, FILM_NAME, DESCRIPTION, DURATION, LIKES_RATING, " +
                 "MPA_RATING_ID, RELEASE_DATE from FILMS";
         return jdbcTemplate.query(sqlSelect, (rs, rowNum) -> makeFilm(rs));
     }
 
     @Override
+    public Film getFilmById(long id) {
+        String sqlSelect = "select FILM_ID, FILM_NAME, DESCRIPTION, DURATION, LIKES_RATING, MPA_RATING_ID, " +
+                "RELEASE_DATE from FILMS " +
+                "where FILM_ID = ?";
+        return jdbcTemplate.queryForObject(sqlSelect, (rs, rowNum) -> makeFilm(rs), id);
+    }
+
+    @Override
     public Film addFilm(Film film) {
-        return null;
+        String sqlInsert = "insert into FILMS (FILM_NAME, DESCRIPTION, DURATION, MPA_RATING_ID, RELEASE_DATE) " +
+                "values (?, ?, ?, ?, ?)";
+        jdbcTemplate.update(sqlInsert,
+                film.getName(),
+                film.getDescription(),
+                film.getDuration(),
+                film.getMPARatingId(),
+                Date.valueOf(film.getReleaseDate())
+        );
+        sqlInsert = "insert into FILM_GENRES (FILM_ID, GENRE_ID) " + // todo нарушается принцип транзакции, но не придумал
+                "values (?, ?)";
+        for (long genreId: film.getFilmGenresId()) {
+            jdbcTemplate.update(sqlInsert,
+                    film.getId(),
+                    genreId
+            );
+        }
+        return film;
     }
 
     @Override
     public Film updateFilm(Film film) {
-        return null;
+        String sqlMerge = "merge into FILMS (FILM_ID, FILM_NAME, DESCRIPTION, DURATION, MPA_RATING_ID, RELEASE_DATE) " +
+                "values (?, ?, ?, ?, ?, ?)";
+        jdbcTemplate.update(sqlMerge,
+                film.getId(),
+                film.getName(),
+                film.getDescription(),
+                film.getDuration(),
+                film.getMPARatingId(),
+                Date.valueOf(film.getReleaseDate())
+        );
+        String sqlDelete = "delete from FILM_GENRES " +
+                "where FILM_ID = ?";
+        jdbcTemplate.update(sqlDelete, film.getId());
+        sqlMerge = "insert into FILM_GENRES (FILM_ID, GENRE_ID) " + // todo нарушается принцип транзакции, но не придумал
+                "values (?, ?)";
+        for (long genreId: film.getFilmGenresId()) {
+            jdbcTemplate.update(sqlMerge,
+                    film.getId(),
+                    genreId
+            );
+        }
+        return film;
     }
 
     @Override
@@ -50,14 +98,20 @@ public class DBFilmStorage implements FilmStorage {
     }
 
     @Override
+    public List<Long> getAllFilmIds() {
+        String sql = "select FILM_ID from FILMS";
+        return jdbcTemplate.queryForList(sql, Long.class);
+    }
+
+    @Override
     public Map<Long, Film> getFilms() {
         return null;
-    }
+    } // заглушка реализации в памяти
 
     @Override
     public Map<Long, Set<User>> getLikeIds() {
         return null;
-    }
+    } // заглушка реализации в памяти
 
     /**
      * создать объект фильма из бд
@@ -72,8 +126,8 @@ public class DBFilmStorage implements FilmStorage {
                     .duration(rs.getInt("DURATION"))
                     .likesRating(rs.getLong("LIKES_RATING"))
                     //todo взять из таблицы фильмов, не забыть это значение там обновлять
-                    .filmGenresId(rs.getLong("FILM_GENRES_ID"))
-                    //todo взять из таблицы фильмов, не забыть это значение там обновлять
+                    .filmGenresId(new ArrayList<>())
+                    //todo взять из таблицы жанров фильмов, не забыть это значение там обновлять
                     .MPARatingId(rs.getLong("MPA_RATING_ID"))
                     //todo взять из таблицы фильмов, не забыть это значение там обновлять
                     .build();
