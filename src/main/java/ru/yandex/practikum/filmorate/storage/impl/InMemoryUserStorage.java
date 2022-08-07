@@ -23,11 +23,6 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User getUserById(long id) {
-        return null;
-    }
-
-    @Override
     public User addUser(User user) {
         user.setId(idGenerator.getId());
         users.put(user.getId(), user);
@@ -54,12 +49,17 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
+    public User getUserById(long id) {
+        return null;
+    } /* заглушка реализации БД */
+
+    @Override
     public Set<User> getUserFriendIds(long id) {
         return null;
-    }
+    } /* заглушка реализации БД */
 
     @Override
     public List<Long> getAllUserIds() {
         return null;
-    }
+    }/* заглушка реализации БД */
 }

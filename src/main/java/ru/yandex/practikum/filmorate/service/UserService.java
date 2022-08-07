@@ -72,12 +72,6 @@ public class UserService {
         checkUserId(userId);
         checkUserId(friendId);
         userStorage.addFriend(userId, friendId); /* добавить друга пользователю */
-        //userStorage.addFriend(friendId, userId); /* добавить пользователя другу */ //todo оставлю на случай если
-        // todo не нужно подтверждение дружбы
-        //getUserById(userId).setFriendsCount(userStorage.getUserFriendIds().get(userId).size());
-        /* обновить количество друзей пользователя*/ //todo доделать после того как все методы будут переделаны на бд
-        //getUserById(friendId).setFriendsCount(userStorage.getUserFriendIds().get(friendId).size());
-        /* обновить количество друзей у друга*/ //todo доделать после того как все методы будут переделаны на бд
         return getUserById(userId);
     }
 
@@ -91,12 +85,6 @@ public class UserService {
         checkUserId(userId);
         checkUserId(friendId);
         userStorage.removeFriend(userId, friendId); /* удалить друга у пользователя */
-        //userStorage.removeFriend(friendId, userId); /* удалить пользователя у друга */ //todo оставлю на случай если
-        // todo не нужно подтверждение дружбы
-        //getUserById(userId).setFriendsCount(userStorage.getUserFriendIds().get(userId).size());
-        /* обновить количество друзей */ //todo доделать после того как все методы будут переделаны на бд
-        //getUserById(friendId).setFriendsCount(userStorage.getUserFriendIds().get(friendId).size());
-        /* обновить количество друзей у друга*/ //todo доделать после того как все методы будут переделаны на бд
         return getUserById(userId);
     }
 
@@ -128,7 +116,7 @@ public class UserService {
     }
 
     /**
-     * проверка пользователя
+     * проверка входных полей пользователя
      */
     private void userValidation(User user) {
         if (user.getLogin().contains(" ")) {

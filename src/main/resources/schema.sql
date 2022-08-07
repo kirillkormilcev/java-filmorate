@@ -53,7 +53,7 @@ create table if not exists USERS (
     LOGIN         CHARACTER VARYING(50)  not null,
     EMAIL         CHARACTER VARYING(200) not null,
     BIRTHDAY      DATE,
-    FRIENDS_COUNT INTEGER,
+    FRIENDS_COUNT INTEGER DEFAULT 0,
     constraint USER_ID
         primary key (USER_ID)
 );

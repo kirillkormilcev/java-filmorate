@@ -17,13 +17,16 @@ import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-/** реализация хранилища в базе данных */
+/**
+ * реализация хранилища в базе данных
+ */
 @Repository
 @Qualifier
 @RequiredArgsConstructor
 public class DBUserStorage implements UserStorage {
 
     private final JdbcTemplate jdbcTemplate;
+
     @Override
     public List<User> getListOfUsers() {
         String sqlSelect = "select USER_ID, EMAIL, LOGIN, USER_NAME, BIRTHDAY, FRIENDS_COUNT from USERS";
@@ -31,7 +34,7 @@ public class DBUserStorage implements UserStorage {
     }
 
     @Override
-    public User getUserById (long id) {
+    public User getUserById(long id) {
         String sqlSelect = "select USER_ID, EMAIL, LOGIN, USER_NAME, BIRTHDAY, FRIENDS_COUNT from USERS " +
                 "where USER_ID = ?";
         return jdbcTemplate.queryForObject(sqlSelect, (rs, rowNum) -> makeUser(rs), id);
@@ -39,16 +42,17 @@ public class DBUserStorage implements UserStorage {
 
     @Override
     public User addUser(User user) {
-        String sqlInsert = "insert into USERS (EMAIL, LOGIN, USER_NAME, BIRTHDAY, FRIENDS_COUNT)" +
-                "values (?, ?, ?, ?, ?)";
+        String sqlInsert = "insert into USERS (EMAIL, LOGIN, USER_NAME, BIRTHDAY)" +
+                "values (?, ?, ?, ?)";
         jdbcTemplate.update(sqlInsert,
                 user.getEmail(),
                 user.getLogin(),
                 user.getName(),
-                Date.valueOf(user.getBirthday()),
-                user.getFriendsCount() // TODO вычислить из таблицы дружбы
-                );
-        // TODO извлечь и присвоить id пользователю бы
+                Date.valueOf(user.getBirthday())
+        );
+        // TODO извлечь и присвоить id пользователю бы, но надо ли
+        // TODO keyHolder не понял почему-то не работал, значение null
+        // TODO может из-за merge пользователей через data.sql, проверить
         return user;
     }
 
@@ -62,7 +66,7 @@ public class DBUserStorage implements UserStorage {
                 user.getLogin(),
                 user.getName(),
                 Date.valueOf(user.getBirthday()),
-                user.getFriendsCount() //TODO вычислить из таблицы дружбы
+                friendsCountByUserId(user.getId())
         );
         return user;
     }
@@ -76,12 +80,15 @@ public class DBUserStorage implements UserStorage {
                 "values (?, ?, ?)";
         if (direct == FriendshipCheck.DIRECT_NOT_YET & revert == FriendshipCheck.REVERT_FIRST) {
             jdbcTemplate.update(sqlInsert, userId, friendId, false); // добавляем этот запрос с флагом false
+            updateUserFriendsCount(friendId); // обновляем количество друзей
         } else if (direct == FriendshipCheck.DIRECT_NOT_YET & revert == FriendshipCheck.REVERT_ONE_SIDED) {
             jdbcTemplate.update(sqlInsert, userId, friendId, true); // добавляем его с флагом true
             String sqlDelete = "delete from FRIENDSHIPS " +
                     "where USER1_ID = ? and FRIEND2_ID = ?";
             jdbcTemplate.update(sqlDelete, friendId, userId); // удаляем старый противоположный запрос
             jdbcTemplate.update(sqlInsert, friendId, userId, true); // вместо него добавляем такой же с флагом true
+            updateUserFriendsCount(userId); // обновляем количество друзей
+            updateUserFriendsCount(friendId);
         } else if (direct == FriendshipCheck.DIRECT_SAME_FALSE) {
             throw new CustomSQLException("Запрос на дружбу уже отправлен!");
         } else if (direct == FriendshipCheck.DIRECT_SAME_TRUE) {
@@ -101,12 +108,15 @@ public class DBUserStorage implements UserStorage {
                 "where USER1_ID = ? and FRIEND2_ID = ?";
         if (direct == FriendshipCheck.DIRECT_SAME_FALSE & revert == FriendshipCheck.REVERT_FIRST) {
             jdbcTemplate.update(sqlDelete, userId, friendId); // удаляем этот запрос
+            updateUserFriendsCount(friendId); // обновляем количество друзей
         } else if (direct == FriendshipCheck.DIRECT_SAME_TRUE & revert == FriendshipCheck.REVERT_TWO_SIDED) {
             jdbcTemplate.update(sqlDelete, userId, friendId); // удаляем этот запрос
             jdbcTemplate.update(sqlDelete, friendId, userId); // противоположный тоже
             String sqlInsert = "insert into FRIENDSHIPS (USER1_ID, FRIEND2_ID, CONFIRM) " +
                     "values (?, ?, ?)";
             jdbcTemplate.update(sqlInsert, friendId, userId, false); // заменяем true на false
+            updateUserFriendsCount(userId); // обновляем количество друзей
+            updateUserFriendsCount(friendId);
         } else if (direct == FriendshipCheck.DIRECT_SAME_FALSE & revert == FriendshipCheck.REVERT_ONE_SIDED) {
             throw new CustomSQLException("Ошибка БД: два противоположных не подтвержденных запроса.");
         } else if (direct == FriendshipCheck.DIRECT_SAME_FALSE & revert == FriendshipCheck.REVERT_TWO_SIDED) {
@@ -126,13 +136,11 @@ public class DBUserStorage implements UserStorage {
 
     @Override
     public Set<User> getUserFriendIds(long id) {
-        String sqlSelect = "select * from FRIENDSHIPS " +
+        String sqlSelect = "select USER1_ID, FRIEND2_ID from FRIENDSHIPS " +
                 "where FRIEND2_ID = ?";
         return jdbcTemplate.queryForStream(sqlSelect, (rs, rowNum) -> getUserById(rs.getLong("USER1_ID")), id)
                 .collect(Collectors.toSet());
     }
-
-
 
     @Override
     public List<Long> getAllUserIds() {
@@ -150,8 +158,10 @@ public class DBUserStorage implements UserStorage {
         return null;
     }
 
-    /** создать объект пользователя из бд */
-    private User makeUser (ResultSet rs){
+    /**
+     * создать объект пользователя из бд
+     */
+    private User makeUser(ResultSet rs) {
         try {
             return User.builder()
                     .id(rs.getLong("USER_ID"))
@@ -159,14 +169,18 @@ public class DBUserStorage implements UserStorage {
                     .login(rs.getString("LOGIN"))
                     .name(rs.getString("USER_NAME"))
                     .birthday(rs.getDate("BIRTHDAY").toLocalDate())
-                    .friendsCount(rs.getInt("FRIENDS_COUNT"))
+                    .friendsCount(friendsCountByUserId(rs.getLong("USER_ID")))
+                    /* TODO здесь вычисляю, но можно и из таблицы пользователей взять, там тоже вычисляется
+                    TODO оставил пока оба способа */
                     .build();
         } catch (SQLException | RuntimeException e) { // TODO правильный ли отлов ошибок
             throw new CustomSQLException("Ошибка при создании пользователя из строки БД.");
         }
     }
 
-    /** проверка дружбы */
+    /**
+     * проверка дружбы
+     */
     private FriendshipCheck[] checkFriendship(long userId, long friendId) {
         FriendshipCheck direct = null;
         String sql = "select CONFIRM from FRIENDSHIPS " +
@@ -179,9 +193,7 @@ public class DBUserStorage implements UserStorage {
             } else if (userRowsDirect.getBoolean("CONFIRM")) {
                 // если такой запрос с флагом true уже отправлен
                 direct = FriendshipCheck.DIRECT_SAME_TRUE;
-            } /*else if (userRowsDirect.wasNull()) {
-                direct = FriendshipCheck.DIRECT_NOT_YET;
-            }*/ //todo дублирование, если тесты норм, то убрать
+            }
         } else {
             direct = FriendshipCheck.DIRECT_NOT_YET;
         }
@@ -197,16 +209,35 @@ public class DBUserStorage implements UserStorage {
             } else if (!userRowsRevert.getBoolean("CONFIRM")) {
                 // если есть противоположный запрос с флагом false
                 revert = FriendshipCheck.REVERT_ONE_SIDED;
-            } /*else if (userRowsRevert.wasNull()) { // если запроса еще нет
-                revert = FriendshipCheck.REVERT_FIRST;
-            }*/ //todo дублирование, если тесты норм, то убрать
-        }  else {
+            }
+        } else {
             revert = FriendshipCheck.REVERT_FIRST;
         }
         if (revert == null) {
             throw new CustomSQLException("Неожиданный результат при обратном запросе в проверке дружбы");
         }
-        return new FriendshipCheck[] {direct, revert};
-        //jdbcTemplate.queryForObject(sql, new Long[]{userId, friendId}, new int[]{1}, Long.class);
+        return new FriendshipCheck[]{direct, revert};
+    }
+
+    /**
+     * количество друзей пользователя
+     */
+    private long friendsCountByUserId(long id) {
+        String sqlSelect = "select count(FRIEND2_ID) from FRIENDSHIPS " +
+                "where FRIEND2_ID = ?";
+        return Objects.requireNonNullElse(jdbcTemplate.queryForObject(sqlSelect, long.class, id), 0L);
+    }
+
+    /**
+     * редактировать количество друзей в таблице пользователей
+     */
+    private void updateUserFriendsCount(long id) {
+        String sqlMerge = "merge into USERS (USER_ID, FRIENDS_COUNT)" +
+                "values (?, ?)";
+        jdbcTemplate.update(sqlMerge,
+                id,
+                friendsCountByUserId(id)
+        );
+
     }
 }
