@@ -41,7 +41,7 @@ public class FilmService {
      */
     public Film getFilmById(Long filmId) {
         checkFilmId(filmId);
-        return filmStorage.getFilms().get(filmId);
+        return filmStorage.getFilmById(filmId);
     }
 
     /**
@@ -119,7 +119,7 @@ public class FilmService {
     }
 
     /**
-     * проверка фильма
+     * проверка полей фильма
      */
     private void filmValidation(Film film) {
         if (film.getDescription().length() > 200) {
@@ -134,7 +134,7 @@ public class FilmService {
             throw new FilmValidationException("Продолжительность фильма " + film.getName() + " отрицательная: "
                     + film.getDuration() + ".");
         }
-        for (Film filmAvailable : filmStorage.getFilms().values()) {
+        for (Film filmAvailable : filmStorage.getListOfFilms()) {
             if (film.getName().equals(filmAvailable.getName())) {
                 if (filmAvailable.getId() == film.getId()) {
                     return;
@@ -150,7 +150,7 @@ public class FilmService {
      * проверка наличия индекса фильма в базе
      */
     private void checkFilmId(long filmId) {
-        if (!filmStorage.getFilms().containsKey(filmId)) {
+        if (!filmStorage.getAllFilmIds().contains(filmId)) {
             throw new NotFoundException("Фильма с индексом: " + filmId + " нет в базе фильмов.");
         }
     }

@@ -133,7 +133,6 @@ public class DBUserStorage implements UserStorage {
         }
     }
 
-
     @Override
     public Set<User> getUserFriendIds(long id) {
         String sqlSelect = "select USER1_ID, FRIEND2_ID from FRIENDSHIPS " +
@@ -149,14 +148,14 @@ public class DBUserStorage implements UserStorage {
     }
 
     @Override
-    public Map<Long, User> getUsers() { /* заглушка реализации в памяти */
+    public Map<Long, User> getUsers() {
         return null;
-    }
+    } /* заглушка реализации в памяти */
 
     @Override
-    public Map<Long, Set<Film>> getLikedFilmIds() { /* заглушка реализации в памяти */
+    public Map<Long, Set<Film>> getLikedFilmIds() {
         return null;
-    }
+    } /* заглушка реализации в памяти */
 
     /**
      * создать объект пользователя из бд
