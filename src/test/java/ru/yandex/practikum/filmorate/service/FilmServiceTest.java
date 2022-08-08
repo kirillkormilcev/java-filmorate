@@ -1,87 +1,25 @@
-package ru.yandex.practikum.filmorate;
+package ru.yandex.practikum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import ru.yandex.practikum.filmorate.exception.FilmValidationException;
 import ru.yandex.practikum.filmorate.model.film.Film;
 import ru.yandex.practikum.filmorate.model.film.MPA;
 import ru.yandex.practikum.filmorate.model.user.User;
-import ru.yandex.practikum.filmorate.storage.FilmStorage;
-import ru.yandex.practikum.filmorate.storage.UserStorage;
 
 import java.time.LocalDate;
 
-
+import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-class FilmorateApplicationTests {
+class FilmServiceTest {
 
-    private final UserStorage userStorage;
-    private final FilmStorage filmStorage;
+    private final FilmService filmService;
 
-    User user1 = User.builder()
-            .email("kirill@kormilcev.ru")
-            .login("kirill")
-            .name("Кирилл")
-            .birthday(LocalDate.of(1982,2,4))
-            .build();
-    User user2 = User.builder()
-            .email("jkgjg@ssh.ru")
-            .login("hello")
-            .name("Половинка")
-            .birthday(LocalDate.of(1981,2,4))
-            .build();
-
-    User user3 = User.builder()
-            .email("jfdhgkgjg@ssh.ru")
-            .login("hello")
-            .name("Половинка")
-            .birthday(LocalDate.of(1980,2,4))
-            .build();
-
-    User userWithSpacesInLogin = User.builder()
-            .email("jkgjg@ssfdgsh.ru")
-            .login("hello gay")
-            .name("Половник")
-            .birthday(LocalDate.of(1980,2,4))
-            .build();
-    User userEmptyName = User.builder()
-            .email("jkdfgjg@ssfdgsh.ru")
-            .login("Hermitage")
-            .name(" ")
-            .birthday(LocalDate.of(1979,2,4))
-            .build();
-
-    User userFutureBirthdate = User.builder()
-            .email("jkdfjhgjg@ssfdgsh.ru")
-            .login("Sorbonne")
-            .name("Главная рыба")
-            .birthday(LocalDate.of(1079,2,4))
-            .build();
-
-    User userWithExistEmail1 = User.builder()
-            .email("hggjgkjmn@ioyure.ru")
-            .login("Glock")
-            .name("Лолита")
-            .birthday(LocalDate.of(1962,2,4))
-            .build();
-
-    User userWithExistEmail2 = User.builder()
-            .email("hgasdfgdfgjgkjmn@ioyure.ru")
-            .login("response")
-            .name("Лолита Милявская")
-            .birthday(LocalDate.of(1942,2,4))
-            .build();
-
-    User userWithExistEmail3 = User.builder()
-            .email("hggjgkjmn@ioyure.ru")
-            .login("entity")
-            .name("Валидол")
-            .birthday(LocalDate.of(1952,2,4))
-            .build();
     MPA mpa = MPA.builder()
             .id(1)
             .build();
@@ -99,7 +37,6 @@ class FilmorateApplicationTests {
             " и душой и телом, надо думать так: “Да, на свете должны быть и такие уроды, и надо терпеть их”." +
             " Если же мы показываем таким людям наше отвращение, то, во-первых, мы несправедливы, а во-вторых," +
             " вызываем таких людей на войну не на жизнь, а на смерть.";
-
     Film filmLongDescription = Film.builder()
             .name("Матрона")
             .description(description)
@@ -172,7 +109,86 @@ class FilmorateApplicationTests {
             .MPA(mpa)
             .build();
 
+    User user1 = User.builder()
+            .email("kirill@kormilcev.ru")
+            .login("kirill")
+            .name("Кирилл")
+            .birthday(LocalDate.of(1982,2,4))
+            .build();
+    User user2 = User.builder()
+            .email("jkgjg@ssh.ru")
+            .login("hermitage")
+            .name("Пополам")
+            .birthday(LocalDate.of(1981,2,4))
+            .build();
+    User user3 = User.builder()
+            .email("jfdhgkgjg@ssh.ru")
+            .login("hello")
+            .name("Половинка")
+            .birthday(LocalDate.of(1980,2,4))
+            .build();
+
     @Test
-    void contextLoads() {
+    void addFilmLongDescription() {
+        try {
+            filmService.addFilmToStorage(filmLongDescription);
+        } catch (FilmValidationException e) {
+            assertEquals("Описание (" + description + ") фильма (Матрона) содержит более 200 символов.",
+                    e.getMessage());
+        }
+    }
+
+    @Test
+    void addFilmEarlyDate() {
+        try {
+            filmService.addFilmToStorage(filmEarlyDate);
+        } catch (FilmValidationException e) {
+            assertEquals("Дата релиза (1009-12-10) фильма (Матрица2) ранее 28 декабря 1895 года.", e.getMessage());
+        }
+    }
+
+    @Test
+    void addNormalFilm() {
+        filmService.addFilmToStorage(film1);
+        assertEquals(filmService.getFilmStorage().getFilmById(film1.getId()), film1);
+    }
+
+    @Test
+    void addNegativeDurationFilm() {
+        try {
+            filmService.addFilmToStorage(filmNegativeDuration);
+        } catch (FilmValidationException e) {
+            assertEquals("Продолжительность фильма Матрица 3 отрицательная: -748.", e.getMessage());
+        }
+    }
+
+    @Test
+    void addExistFilm() {
+        filmService.addFilmToStorage(filmExist1);
+        try {
+            filmService.addFilmToStorage(filmExist2);
+        } catch (FilmValidationException e) {
+            assertEquals("Фильм Матрица 4 с таким названием уже есть в базе под индексом: 1.", e.getMessage());
+        }
+    }
+
+    @Test
+    void updateNormalFilm() {
+        filmService.addFilmToStorage(film2);
+        film3.setId(film2.getId());
+        filmService.updateFilmInStorage(film3);
+        assertEquals(filmService.getFilmById(film3.getId()), film3);
+    }
+
+    @Test
+    void getAllFilmsFromStorage() {
+        filmService.addFilmToStorage(film4);
+        assertEquals(filmService.getFilmStorage().getListOfFilms().size(), filmService.getAllFilmsFromStorage().size());
+    }
+
+    @Test
+    void getFilmById() {
+        filmService.addFilmToStorage(film5);
+        assertEquals(filmService.getFilmStorage().getFilmById(film5.getId()), filmService.getFilmById(film5.getId()));
     }
 }

@@ -1,4 +1,4 @@
-package ru.yandex.practikum.filmorate;
+package ru.yandex.practikum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
@@ -8,80 +8,19 @@ import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practikum.filmorate.model.film.Film;
 import ru.yandex.practikum.filmorate.model.film.MPA;
 import ru.yandex.practikum.filmorate.model.user.User;
-import ru.yandex.practikum.filmorate.storage.FilmStorage;
-import ru.yandex.practikum.filmorate.storage.UserStorage;
 
 import java.time.LocalDate;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-class FilmorateApplicationTests {
+class FilmServiceLikesTest {
 
-    private final UserStorage userStorage;
-    private final FilmStorage filmStorage;
+    private final FilmService filmService1;
+    private final UserService userService1;
 
-    User user1 = User.builder()
-            .email("kirill@kormilcev.ru")
-            .login("kirill")
-            .name("Кирилл")
-            .birthday(LocalDate.of(1982,2,4))
-            .build();
-    User user2 = User.builder()
-            .email("jkgjg@ssh.ru")
-            .login("hello")
-            .name("Половинка")
-            .birthday(LocalDate.of(1981,2,4))
-            .build();
-
-    User user3 = User.builder()
-            .email("jfdhgkgjg@ssh.ru")
-            .login("hello")
-            .name("Половинка")
-            .birthday(LocalDate.of(1980,2,4))
-            .build();
-
-    User userWithSpacesInLogin = User.builder()
-            .email("jkgjg@ssfdgsh.ru")
-            .login("hello gay")
-            .name("Половник")
-            .birthday(LocalDate.of(1980,2,4))
-            .build();
-    User userEmptyName = User.builder()
-            .email("jkdfgjg@ssfdgsh.ru")
-            .login("Hermitage")
-            .name(" ")
-            .birthday(LocalDate.of(1979,2,4))
-            .build();
-
-    User userFutureBirthdate = User.builder()
-            .email("jkdfjhgjg@ssfdgsh.ru")
-            .login("Sorbonne")
-            .name("Главная рыба")
-            .birthday(LocalDate.of(1079,2,4))
-            .build();
-
-    User userWithExistEmail1 = User.builder()
-            .email("hggjgkjmn@ioyure.ru")
-            .login("Glock")
-            .name("Лолита")
-            .birthday(LocalDate.of(1962,2,4))
-            .build();
-
-    User userWithExistEmail2 = User.builder()
-            .email("hgasdfgdfgjgkjmn@ioyure.ru")
-            .login("response")
-            .name("Лолита Милявская")
-            .birthday(LocalDate.of(1942,2,4))
-            .build();
-
-    User userWithExistEmail3 = User.builder()
-            .email("hggjgkjmn@ioyure.ru")
-            .login("entity")
-            .name("Валидол")
-            .birthday(LocalDate.of(1952,2,4))
-            .build();
     MPA mpa = MPA.builder()
             .id(1)
             .build();
@@ -99,7 +38,6 @@ class FilmorateApplicationTests {
             " и душой и телом, надо думать так: “Да, на свете должны быть и такие уроды, и надо терпеть их”." +
             " Если же мы показываем таким людям наше отвращение, то, во-первых, мы несправедливы, а во-вторых," +
             " вызываем таких людей на войну не на жизнь, а на смерть.";
-
     Film filmLongDescription = Film.builder()
             .name("Матрона")
             .description(description)
@@ -172,7 +110,76 @@ class FilmorateApplicationTests {
             .MPA(mpa)
             .build();
 
+    User user1 = User.builder()
+            .email("kirill@kormilcev.ru")
+            .login("kirill")
+            .name("Кирилл")
+            .birthday(LocalDate.of(1982,2,4))
+            .build();
+    User user2 = User.builder()
+            .email("jkgjg@ssh.ru")
+            .login("hermitage")
+            .name("Пополам")
+            .birthday(LocalDate.of(1981,2,4))
+            .build();
+    User user3 = User.builder()
+            .email("jfdhgkgjg@ssh.ru")
+            .login("hello")
+            .name("Половинка")
+            .birthday(LocalDate.of(1980,2,4))
+            .build();
+
     @Test
-    void contextLoads() {
+    void addAndRemoveLikeToFilmAndGetPopular() {
+        filmService1.addFilmToStorage(film1);
+        filmService1.addFilmToStorage(film2);
+        filmService1.addFilmToStorage(film3);
+        filmService1.addFilmToStorage(film4);
+        filmService1.addFilmToStorage(film5);
+
+        userService1.addUserToStorage(user1);
+        userService1.addUserToStorage(user2);
+        userService1.addUserToStorage(user3);
+
+        filmService1.addLikeToFilm(1, 1);
+        filmService1.addLikeToFilm(4, 1);
+        filmService1.addLikeToFilm(4, 2);
+        filmService1.addLikeToFilm(4, 3);
+
+        filmService1.addLikeToFilm(3, 2);
+        filmService1.addLikeToFilm(3, 3);
+        filmService1.addLikeToFilm(5, 2);
+
+        assertEquals(1, filmService1.getFilmById(1L).getLikesRating());
+        assertEquals(0, filmService1.getFilmById(2L).getLikesRating());
+        assertEquals(2, filmService1.getFilmById(3L).getLikesRating());
+        assertEquals(3, filmService1.getFilmById(4L).getLikesRating());
+        assertEquals(1, filmService1.getFilmById(5L).getLikesRating());
+
+        assertEquals(film4, filmService1.getPopularOrTenFirstFilms(5).get(0));
+        assertEquals(film3, filmService1.getPopularOrTenFirstFilms(5).get(1));
+        assertEquals(film1, filmService1.getPopularOrTenFirstFilms(5).get(2));
+        assertEquals(film5, filmService1.getPopularOrTenFirstFilms(5).get(3));
+        assertEquals(film2, filmService1.getPopularOrTenFirstFilms(5).get(4));
+
+        //List<Film> user1FilmsActual = new ArrayList<>(userService1.getUserStorage().getLikedFilmIds().get(1L));
+        //List<Film> user1FilmsExpected = new ArrayList<>(List.of(film1, film4));
+
+        //assertEquals(user1FilmsExpected, user1FilmsActual);
+
+        filmService1.removeLikeFromFilm(3, 2);
+        filmService1.removeLikeFromFilm(3, 3);
+
+        assertEquals(1, filmService1.getFilmById(1L).getLikesRating());
+        assertEquals(0, filmService1.getFilmById(2L).getLikesRating());
+        assertEquals(0, filmService1.getFilmById(3L).getLikesRating());
+        assertEquals(3, filmService1.getFilmById(4L).getLikesRating());
+        assertEquals(1, filmService1.getFilmById(5L).getLikesRating());
+
+        assertEquals(film4, filmService1.getPopularOrTenFirstFilms(5).get(0));
+        assertEquals(film1, filmService1.getPopularOrTenFirstFilms(5).get(1));
+        assertEquals(film5, filmService1.getPopularOrTenFirstFilms(5).get(2));
+        assertEquals(film2, filmService1.getPopularOrTenFirstFilms(5).get(3));
+        assertEquals(film3, filmService1.getPopularOrTenFirstFilms(5).get(4));
     }
 }
