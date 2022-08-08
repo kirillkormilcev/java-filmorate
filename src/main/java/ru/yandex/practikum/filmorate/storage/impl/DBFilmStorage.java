@@ -3,6 +3,8 @@ package ru.yandex.practikum.filmorate.storage.impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practikum.filmorate.exception.CustomSQLException;
 import ru.yandex.practikum.filmorate.model.film.Film;
@@ -12,12 +14,10 @@ import ru.yandex.practikum.filmorate.model.user.User;
 import ru.yandex.practikum.filmorate.storage.FilmStorage;
 
 import java.sql.Date;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 @Repository
 @Qualifier
@@ -28,15 +28,17 @@ public class DBFilmStorage implements FilmStorage {
 
     @Override
     public List<Film> getListOfFilms() {
-        String sqlSelect = "select FILM_ID, FILM_NAME, DESCRIPTION, DURATION, LIKES_RATING, " +
-                "MPA_RATING_ID, RELEASE_DATE from FILMS";
+        String sqlSelect = "select FILM_ID, FILM_NAME, FILMS.DESCRIPTION, DURATION, LIKES_RATING, FILMS.MPA_RATING_ID, " +
+                "RELEASE_DATE, MPA_RATINGS.MPA_RATING_ID, RATING_NAME from FILMS " +
+                "left outer join MPA_RATINGS on FILMS.MPA_RATING_ID = MPA_RATINGS.MPA_RATING_ID";
         return jdbcTemplate.query(sqlSelect, (rs, rowNum) -> makeFilm(rs));
     }
 
     @Override
     public Film getFilmById(long id) {
-        String sqlSelect = "select FILM_ID, FILM_NAME, DESCRIPTION, DURATION, LIKES_RATING, MPA_RATING_ID, " +
-                "RELEASE_DATE from FILMS " +
+        String sqlSelect = "select FILM_ID, FILM_NAME, FILMS.DESCRIPTION, DURATION, LIKES_RATING, FILMS.MPA_RATING_ID, " +
+                "RELEASE_DATE, MPA_RATINGS.MPA_RATING_ID, RATING_NAME from FILMS " +
+                "left outer  join MPA_RATINGS on FILMS.MPA_RATING_ID = MPA_RATINGS.MPA_RATING_ID " +
                 "where FILM_ID = ?";
         return jdbcTemplate.queryForObject(sqlSelect, (rs, rowNum) -> makeFilm(rs), id);
     }
@@ -45,20 +47,32 @@ public class DBFilmStorage implements FilmStorage {
     public Film addFilm(Film film) {
         String sqlInsert = "insert into FILMS (FILM_NAME, DESCRIPTION, DURATION, MPA_RATING_ID, RELEASE_DATE) " +
                 "values (?, ?, ?, ?, ?)";
-        jdbcTemplate.update(sqlInsert,
-                film.getName(),
-                film.getDescription(),
-                film.getDuration(),
-                film.getMPARatingId(),
-                Date.valueOf(film.getReleaseDate())
-        );
-        sqlInsert = "insert into FILM_GENRES (FILM_ID, GENRE_ID) " + // todo нарушается принцип транзакции, но не придумал
-                "values (?, ?)";
-        for (long genreId: film.getFilmGenresId()) {
-            jdbcTemplate.update(sqlInsert,
-                    film.getId(),
-                    genreId
-            );
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update(connection -> {
+            PreparedStatement stmt = connection.prepareStatement(sqlInsert, new String[]{"FILM_ID"});
+            stmt.setString(1, film.getName());
+            stmt.setString(2,  film.getDescription());
+            stmt.setInt(3, film.getDuration());
+            if (film.getMPA() == null) {
+                throw new CustomSQLException("Поступил фильм с полем MPA = null.");
+            }
+            stmt.setInt(4, film.getMPA().getId());
+            stmt.setDate(5, Date.valueOf(film.getReleaseDate()));
+            return stmt;
+        }, keyHolder);
+        film.setId(Objects.requireNonNull(keyHolder.getKey()).longValue());
+        if (film.getGenres() != null) {
+            String sqlInsertGenres = "insert into FILM_GENRES (FILM_ID, GENRE_ID) " + // todo нарушается принцип транзакции, но не придумал
+                    "values (?, ?)";
+            for (Genre genre: film.getGenres()) {
+                jdbcTemplate.update(sqlInsertGenres,
+                        film.getId(),
+                        genre.getId()
+                );
+            }
+        }
+        if (film.getMPA() != null) {
+            film.setMPA(getMPAById(film.getMPA().getId()));
         }
         return film;
     }
@@ -72,21 +86,24 @@ public class DBFilmStorage implements FilmStorage {
                 film.getName(),
                 film.getDescription(),
                 film.getDuration(),
-                film.getMPARatingId(),
+                film.getMPA().getId(),
                 Date.valueOf(film.getReleaseDate())
         );
         String sqlDelete = "delete from FILM_GENRES " +
                 "where FILM_ID = ?";
-        jdbcTemplate.update(sqlDelete, film.getId());
-        sqlMerge = "insert into FILM_GENRES (FILM_ID, GENRE_ID) " + // todo нарушается принцип транзакции, но не придумал
-                "values (?, ?)";
-        for (long genreId: film.getFilmGenresId()) {
-            jdbcTemplate.update(sqlMerge,
-                    film.getId(),
-                    genreId
-            );
+        if (film.getGenres() != null) {
+            jdbcTemplate.update(sqlDelete, film.getId());
+            sqlMerge = "insert into FILM_GENRES (FILM_ID, GENRE_ID) " + // todo нарушается принцип транзакции, но не придумал
+                    "values (?, ?)";
+            for (Genre genre: film.getGenres()) {
+                jdbcTemplate.update(sqlMerge,
+                        film.getId(),
+                        genre.getId()
+                );
+            }
         }
         updateFilmLikesRating(film.getId());
+        film.setMPA(getMPAById(film.getMPA().getId()));
         return film;
     }
 
@@ -159,12 +176,18 @@ public class DBFilmStorage implements FilmStorage {
                     .description(rs.getString("DESCRIPTION"))
                     .releaseDate(rs.getDate("RELEASE_DATE").toLocalDate())
                     .duration(rs.getInt("DURATION"))
-                    .likesRating(rs.getLong("LIKES_RATING"))
-                    .filmGenresId(getGenreIdsByFilmId(rs.getLong("FILM_ID")))
-                    .MPARatingId(rs.getLong("MPA_RATING_ID"))
+                    .likesRating(rs.getInt("LIKES_RATING"))
+                    .genres(new HashSet<>(){{
+                        for (Integer genreId: getGenreIdsByFilmId(rs.getInt("FILM_ID"))) {
+                            add(getGenreById(genreId));
+                        }
+                    }})
+                    .MPA(getMPAById(rs.getInt("MPA_RATING_ID")))
                     .build();
-        } catch (SQLException | RuntimeException e) { // TODO правильный ли отлов ошибок
+        } catch (RuntimeException e) { // TODO правильный ли отлов ошибок
             throw new CustomSQLException("Ошибка при создании фильма из строки БД.");
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -174,8 +197,8 @@ public class DBFilmStorage implements FilmStorage {
     private Genre makeGenre(ResultSet rs) {
         try {
             return Genre.builder()
-                    .genreId(rs.getInt("GENRE_ID"))
-                    .genreName(rs.getString("GENRE_NAME"))
+                    .id(rs.getInt("GENRE_ID"))
+                    .name(rs.getString("GENRE_NAME"))
                     .description(rs.getString("DESCRIPTION"))
                     .build();
         } catch (SQLException | RuntimeException e) { // TODO правильный ли отлов ошибок
@@ -189,8 +212,8 @@ public class DBFilmStorage implements FilmStorage {
     private MPA makeMPA(ResultSet rs) {
         try {
             return MPA.builder()
-                    .MPAId(rs.getInt("MPA_RATING_ID"))
-                    .MPAName(rs.getString("RATING_NAME"))
+                    .id(rs.getInt("MPA_RATING_ID"))
+                    .name(rs.getString("RATING_NAME"))
                     .description(rs.getString("DESCRIPTION"))
                     .build();
         } catch (SQLException | RuntimeException e) { // TODO правильный ли отлов ошибок
@@ -201,10 +224,10 @@ public class DBFilmStorage implements FilmStorage {
     /**
      * список id жанров фильма по его id
      */
-    private List<Long> getGenreIdsByFilmId(long id) {
+    private List<Integer> getGenreIdsByFilmId(long id) {
         String sqlSelect = "select GENRE_ID from FILM_GENRES " +
                 "where FILM_ID = ?";
-        return jdbcTemplate.queryForList(sqlSelect, Long.class, id);
+        return jdbcTemplate.queryForList(sqlSelect, Integer.class, id);
     }
 
     /**

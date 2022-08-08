@@ -4,9 +4,7 @@ import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import ru.yandex.practikum.filmorate.exception.FilmValidationException;
-import ru.yandex.practikum.filmorate.exception.IncorrectRequestParamException;
-import ru.yandex.practikum.filmorate.exception.NotFoundException;
+import ru.yandex.practikum.filmorate.exception.*;
 import ru.yandex.practikum.filmorate.model.film.Film;
 import ru.yandex.practikum.filmorate.model.film.Genre;
 import ru.yandex.practikum.filmorate.model.film.MPA;
@@ -119,6 +117,9 @@ public class FilmService {
      * жанр по id
      */
     public Genre getGenreById (int id) {
+        if (id <= 0) {
+            throw new GenreValidationException("Значение индекса жанра передано меньше или равно 0.");
+        }
         return filmStorage.getGenreById(id);
     }
 
@@ -133,6 +134,9 @@ public class FilmService {
      * MPA рейтинг по id
      */
     public MPA getMPAById (int id) {
+        if (id <= 0) {
+            throw new MPAValidationException("Значение индекса рейтинга MPA передано меньше или равно 0.");
+        }
         return filmStorage.getMPAById(id);
     }
 

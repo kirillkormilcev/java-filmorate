@@ -3,6 +3,8 @@ package ru.yandex.practikum.filmorate.storage.impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practikum.filmorate.exception.CustomSQLException;
@@ -12,10 +14,10 @@ import ru.yandex.practikum.filmorate.model.user.User;
 import ru.yandex.practikum.filmorate.storage.UserStorage;
 
 import java.sql.Date;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * реализация хранилища в базе данных
@@ -44,15 +46,16 @@ public class DBUserStorage implements UserStorage {
     public User addUser(User user) {
         String sqlInsert = "insert into USERS (EMAIL, LOGIN, USER_NAME, BIRTHDAY)" +
                 "values (?, ?, ?, ?)";
-        jdbcTemplate.update(sqlInsert,
-                user.getEmail(),
-                user.getLogin(),
-                user.getName(),
-                Date.valueOf(user.getBirthday())
-        );
-        // TODO извлечь и присвоить id пользователю бы, но надо ли
-        // TODO keyHolder не понял почему-то не работал, значение null
-        // TODO может из-за merge пользователей через data.sql, проверить
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update(connection -> {
+            PreparedStatement stmt = connection.prepareStatement(sqlInsert, new String[]{"USER_ID"});
+            stmt.setString(1, user.getEmail());
+            stmt.setString(2,  user.getLogin());
+            stmt.setString(3, user.getName());
+            stmt.setDate(4, Date.valueOf(user.getBirthday()));
+            return stmt;
+        }, keyHolder);
+        user.setId(Objects.requireNonNull(keyHolder.getKey()).longValue());
         return user;
     }
 
@@ -135,10 +138,16 @@ public class DBUserStorage implements UserStorage {
 
     @Override
     public Set<User> getUserFriendIds(long id) {
-        String sqlSelect = "select USER1_ID, FRIEND2_ID from FRIENDSHIPS " +
-                "where FRIEND2_ID = ?";
-        return jdbcTemplate.queryForStream(sqlSelect, (rs, rowNum) -> getUserById(rs.getLong("USER1_ID")), id)
-                .collect(Collectors.toSet());
+        String sqlSelect = "select FRIEND2_ID from FRIENDSHIPS " +
+                "where USER1_ID = ?";
+        Set<Long> userFriendsIds = new HashSet<>(jdbcTemplate.queryForList(sqlSelect, Long.class, id));
+        Set<User> userFriends = new HashSet<>();
+        for (Long friendId: userFriendsIds) {
+            userFriends.add(getUserById(friendId));
+        }
+        /*return jdbcTemplate.queryForStream(sqlSelect, (rs, rowNum) -> getUserById(rs.getLong("FRIEND2_ID")), id)
+                .collect(Collectors.toSet());*/
+        return userFriends;
     }
 
     @Override
@@ -169,8 +178,6 @@ public class DBUserStorage implements UserStorage {
                     .name(rs.getString("USER_NAME"))
                     .birthday(rs.getDate("BIRTHDAY").toLocalDate())
                     .friendsCount(friendsCountByUserId(rs.getLong("USER_ID")))
-                    /* TODO здесь вычисляю, но можно и из таблицы пользователей взять, там тоже вычисляется
-                    TODO оставил пока оба способа */
                     .build();
         } catch (SQLException | RuntimeException e) { // TODO правильный ли отлов ошибок
             throw new CustomSQLException("Ошибка при создании пользователя из строки БД.");

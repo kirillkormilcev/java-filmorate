@@ -7,7 +7,7 @@ import lombok.Data;
 @Data
 @Builder
 public class MPA {
-    private final int MPAId;
-    private final String MPAName;
+    private final int id;
+    private final String name;
     private final String description;
 }
