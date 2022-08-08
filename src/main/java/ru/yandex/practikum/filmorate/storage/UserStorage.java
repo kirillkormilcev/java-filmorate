@@ -53,7 +53,9 @@ public interface UserStorage {
      */
     Map<Long, Set<Film>> getLikedFilmIds();
 
-    /** получить id всех пользователей*/
+    /**
+     * получить id всех пользователей
+     */
     List<Long> getAllUserIds();
 }
 

@@ -51,7 +51,7 @@ public class DBFilmStorage implements FilmStorage {
         jdbcTemplate.update(connection -> {
             PreparedStatement stmt = connection.prepareStatement(sqlInsert, new String[]{"FILM_ID"});
             stmt.setString(1, film.getName());
-            stmt.setString(2,  film.getDescription());
+            stmt.setString(2, film.getDescription());
             stmt.setInt(3, film.getDuration());
             if (film.getMPA() == null) {
                 throw new CustomSQLException("Поступил фильм с полем MPA = null.");
@@ -64,7 +64,7 @@ public class DBFilmStorage implements FilmStorage {
         if (film.getGenres() != null) {
             String sqlInsertGenres = "insert into FILM_GENRES (FILM_ID, GENRE_ID) " + // todo нарушается принцип транзакции, но не придумал
                     "values (?, ?)";
-            for (Genre genre: film.getGenres()) {
+            for (Genre genre : film.getGenres()) {
                 jdbcTemplate.update(sqlInsertGenres,
                         film.getId(),
                         genre.getId()
@@ -95,7 +95,7 @@ public class DBFilmStorage implements FilmStorage {
             jdbcTemplate.update(sqlDelete, film.getId());
             sqlMerge = "insert into FILM_GENRES (FILM_ID, GENRE_ID) " + // todo нарушается принцип транзакции, но не придумал
                     "values (?, ?)";
-            for (Genre genre: film.getGenres()) {
+            for (Genre genre : film.getGenres()) {
                 jdbcTemplate.update(sqlMerge,
                         film.getId(),
                         genre.getId()
@@ -177,8 +177,8 @@ public class DBFilmStorage implements FilmStorage {
                     .releaseDate(rs.getDate("RELEASE_DATE").toLocalDate())
                     .duration(rs.getInt("DURATION"))
                     .likesRating(rs.getInt("LIKES_RATING"))
-                    .genres(new HashSet<>(){{
-                        for (Integer genreId: getGenreIdsByFilmId(rs.getInt("FILM_ID"))) {
+                    .genres(new HashSet<>() {{
+                        for (Integer genreId : getGenreIdsByFilmId(rs.getInt("FILM_ID"))) {
                             add(getGenreById(genreId));
                         }
                     }})
@@ -233,7 +233,7 @@ public class DBFilmStorage implements FilmStorage {
     /**
      * обновить количество лайков у фильма
      */
-    private void updateFilmLikesRating (long id) {
+    private void updateFilmLikesRating(long id) {
         String sqlMerge = "merge into FILMS (FILM_ID, LIKES_RATING)" +
                 "values (?, ?)";
         jdbcTemplate.update(sqlMerge,
@@ -245,7 +245,7 @@ public class DBFilmStorage implements FilmStorage {
     /**
      * количество лайков у фильма по его id
      */
-    private long likesCountByFilmId (long id) {
+    private long likesCountByFilmId(long id) {
         String sqlSelect = "select count(USER_ID) from LIKES " +
                 "where FILM_ID = ?";
         return Objects.requireNonNullElse(jdbcTemplate.queryForObject(sqlSelect, long.class, id), 0L);

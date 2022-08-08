@@ -11,7 +11,7 @@ import java.util.Set;
 /**
  * класс фильма
  */
-@EqualsAndHashCode(of="id")
+@EqualsAndHashCode(of = "id")
 @Getter
 @Setter
 @AllArgsConstructor

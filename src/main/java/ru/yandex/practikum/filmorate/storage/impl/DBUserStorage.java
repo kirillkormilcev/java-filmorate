@@ -50,7 +50,7 @@ public class DBUserStorage implements UserStorage {
         jdbcTemplate.update(connection -> {
             PreparedStatement stmt = connection.prepareStatement(sqlInsert, new String[]{"USER_ID"});
             stmt.setString(1, user.getEmail());
-            stmt.setString(2,  user.getLogin());
+            stmt.setString(2, user.getLogin());
             stmt.setString(3, user.getName());
             stmt.setDate(4, Date.valueOf(user.getBirthday()));
             return stmt;
@@ -142,7 +142,7 @@ public class DBUserStorage implements UserStorage {
                 "where USER1_ID = ?";
         Set<Long> userFriendsIds = new HashSet<>(jdbcTemplate.queryForList(sqlSelect, Long.class, id));
         Set<User> userFriends = new HashSet<>();
-        for (Long friendId: userFriendsIds) {
+        for (Long friendId : userFriendsIds) {
             userFriends.add(getUserById(friendId));
         }
         /*return jdbcTemplate.queryForStream(sqlSelect, (rs, rowNum) -> getUserById(rs.getLong("FRIEND2_ID")), id)

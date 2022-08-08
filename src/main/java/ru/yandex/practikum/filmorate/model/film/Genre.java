@@ -3,7 +3,9 @@ package ru.yandex.practikum.filmorate.model.film;
 import lombok.Builder;
 import lombok.Data;
 
-/** класс жанра фильма */
+/**
+ * класс жанра фильма
+ */
 @Data
 @Builder
 public class Genre {

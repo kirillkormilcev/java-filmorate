@@ -1,7 +1,7 @@
 create table if not exists MPA_RATINGS (
     MPA_RATING_ID INTEGER auto_increment,
     RATING_NAME   CHARACTER VARYING(5),
-    DESCRIPTION   CHARACTER VARYING(100),
+    DESCRIPTION   CHARACTER VARYING(200),
     constraint MPA_RATING_ID
         primary key (MPA_RATING_ID)
 );
@@ -9,7 +9,7 @@ create table if not exists MPA_RATINGS (
 create table if not exists GENRES (
     GENRE_ID    INTEGER auto_increment,
     GENRE_NAME  CHARACTER VARYING(50),
-    DESCRIPTION CHARACTER VARYING(100),
+    DESCRIPTION CHARACTER VARYING(200),
     constraint GENRE_ID
         primary key (GENRE_ID)
 );

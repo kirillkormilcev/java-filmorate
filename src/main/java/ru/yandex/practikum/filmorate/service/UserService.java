@@ -103,8 +103,6 @@ public class UserService {
         if (userId == otherId) {
             throw new UserValidationException("Общие друзья себя самого?! Однако!");
         }
-        //checkUserId(userId);
-        //checkUserId(otherId);
         Set<User> commonUserFriends = new HashSet<>(getFriendsByUserId(userId)); /* множество друзей пользователя */
         Set<User> otherFriends = new HashSet<>(getFriendsByUserId(otherId)); /* множество друзей другого пользователя */
         commonUserFriends.retainAll(otherFriends); /* пересечение этих множеств (общие друзья) */

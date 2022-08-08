@@ -7,12 +7,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest
 class FilmorateApplicationTests {
 
-    /*@BeforeAll
-    static void start() {
-        String[] args = new String[0];
-        FilmorateApplication.main(args);
-    }*/
-
     @Test
     void contextLoads() {
     }

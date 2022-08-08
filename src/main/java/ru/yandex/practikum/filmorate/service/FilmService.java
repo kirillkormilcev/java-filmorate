@@ -109,14 +109,14 @@ public class FilmService {
     /**
      * список всех жанров
      */
-    public List<Genre> getAllGenres () {
+    public List<Genre> getAllGenres() {
         return filmStorage.getAllGenres();
     }
 
     /**
      * жанр по id
      */
-    public Genre getGenreById (int id) {
+    public Genre getGenreById(int id) {
         if (id <= 0) {
             throw new GenreValidationException("Значение индекса жанра передано меньше или равно 0.");
         }
@@ -126,14 +126,14 @@ public class FilmService {
     /**
      * список всех MPA рейтингов
      */
-    public List<MPA> getAllMPAs () {
+    public List<MPA> getAllMPAs() {
         return filmStorage.getAllMPAs();
     }
 
     /**
      * MPA рейтинг по id
      */
-    public MPA getMPAById (int id) {
+    public MPA getMPAById(int id) {
         if (id <= 0) {
             throw new MPAValidationException("Значение индекса рейтинга MPA передано меньше или равно 0.");
         }
