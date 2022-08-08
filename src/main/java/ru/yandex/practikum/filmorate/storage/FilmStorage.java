@@ -1,6 +1,8 @@
 package ru.yandex.practikum.filmorate.storage;
 
 import ru.yandex.practikum.filmorate.model.film.Film;
+import ru.yandex.practikum.filmorate.model.film.Genre;
+import ru.yandex.practikum.filmorate.model.film.MPA;
 import ru.yandex.practikum.filmorate.model.user.User;
 
 import java.util.*;
@@ -15,7 +17,7 @@ public interface FilmStorage {
     /**
      * получить фильм по id
      */
-    public Film getFilmById(long id);
+    Film getFilmById(long id);
 
     /**
      * добавить фильм
@@ -40,7 +42,27 @@ public interface FilmStorage {
     /**
      * список id всех фильмов
      */
-    public List<Long> getAllFilmIds();
+    List<Long> getAllFilmIds();
+
+    /**
+     * получить жанр по id
+     */
+    Genre getGenreById(int id);
+
+    /**
+     * получить все MPA рейтинги
+     */
+    List<MPA> getAllMPAs();
+
+    /**
+     * получить MPA рейтинг по id
+     */
+    MPA getMPAById(int id);
+
+    /**
+     * получить все жанры
+     */
+    List<Genre> getAllGenres();
 
     /**
      * геттер мапы фильмов

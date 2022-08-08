@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import ru.yandex.practikum.filmorate.model.film.Film;
+import ru.yandex.practikum.filmorate.model.film.Genre;
+import ru.yandex.practikum.filmorate.model.film.MPA;
 import ru.yandex.practikum.filmorate.model.user.User;
 import ru.yandex.practikum.filmorate.storage.FilmStorage;
 import ru.yandex.practikum.filmorate.storage.IdGenerator;
@@ -63,6 +65,26 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public List<Long> getAllFilmIds() {
+        return null;
+    } // заглушка реализации в БД
+
+    @Override
+    public Genre getGenreById(int id) {
+        return null;
+    } // заглушка реализации в БД
+
+    @Override
+    public List<MPA> getAllMPAs() {
+        return null;
+    } // заглушка реализации в БД
+
+    @Override
+    public MPA getMPAById(int id) {
+        return null;
+    } // заглушка реализации в БД
+
+    @Override
+    public List<Genre> getAllGenres() {
         return null;
     } // заглушка реализации в БД
 }

@@ -8,12 +8,13 @@ import ru.yandex.practikum.filmorate.exception.FilmValidationException;
 import ru.yandex.practikum.filmorate.exception.IncorrectRequestParamException;
 import ru.yandex.practikum.filmorate.exception.NotFoundException;
 import ru.yandex.practikum.filmorate.model.film.Film;
+import ru.yandex.practikum.filmorate.model.film.Genre;
+import ru.yandex.practikum.filmorate.model.film.MPA;
 import ru.yandex.practikum.filmorate.storage.FilmStorage;
 import ru.yandex.practikum.filmorate.storage.UserStorage;
 
 import java.time.LocalDate;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -68,18 +69,11 @@ public class FilmService {
      */
     public Film addLikeToFilm(long filmId, long userId) {
         checkFilmId(filmId);
-        if (!userStorage.getUsers().containsKey(userId)) {
+        if (!userStorage.getAllUserIds().contains(userId)) {
             throw new NotFoundException("Пользователя с индексом: " + userId + " нет в базе пользователей.");
         }
         filmStorage.addLikeUserToFilm(filmId, userId); /* добавить лайкнувшего пользователя к фильму */
-        if (!userStorage.getLikedFilmIds().containsKey(userId)) {
-            userStorage.getLikedFilmIds().put(userId, new HashSet<>());
-        } /* если в мапе еще не множества фильмов пролайканых пользователем, то создать */
-        userStorage.getLikedFilmIds().get(userId).add(filmStorage.getFilms().get(filmId));
-        /* добавить понравившийся фильм пользователю */
-        getFilmById(filmId).setLikesRating(filmStorage.getLikeIds().get(filmId).size());
-        /* обновить количество лайков у фильма */
-        return filmStorage.getFilms().get(filmId);
+        return filmStorage.getFilmById(filmId);
     }
 
     /**
@@ -87,15 +81,11 @@ public class FilmService {
      */
     public Film removeLikeFromFilm(long filmId, long userId) {
         checkFilmId(filmId);
-        if (!userStorage.getUsers().containsKey(userId)) {
+        if (!userStorage.getAllUserIds().contains(userId)) {
             throw new NotFoundException("Пользователя с индексом: " + userId + " нет в базе пользователей.");
         }
         filmStorage.removeLikeUserFromFilm(filmId, userId); /* удалить лайкнувшего пользователя у фильма */
-        userStorage.getLikedFilmIds().get(userId).remove(filmStorage.getFilms().get(filmId));
-        /* удалить понравившийся фильм у пользователя */
-        getFilmById(filmId).setLikesRating(filmStorage.getLikeIds().get(filmId).size());
-        /* обновить количество лайков у фильма */
-        return filmStorage.getFilms().get(filmId);
+        return filmStorage.getFilmById(filmId);
     }
 
     /**
@@ -114,8 +104,36 @@ public class FilmService {
                     return (int) (o1.getId() - o2.getId()); /* при равных лайках по id */
                 }
             };
-            return filmStorage.getFilms().values().stream().sorted(comparatorSortByLikeCount).limit(count).collect(Collectors.toList());
+            return filmStorage.getListOfFilms().stream().sorted(comparatorSortByLikeCount).limit(count).collect(Collectors.toList());
         }
+    }
+
+    /**
+     * список всех жанров
+     */
+    public List<Genre> getAllGenres () {
+        return filmStorage.getAllGenres();
+    }
+
+    /**
+     * жанр по id
+     */
+    public Genre getGenreById (int id) {
+        return filmStorage.getGenreById(id);
+    }
+
+    /**
+     * список всех MPA рейтингов
+     */
+    public List<MPA> getAllMPAs () {
+        return filmStorage.getAllMPAs();
+    }
+
+    /**
+     * MPA рейтинг по id
+     */
+    public MPA getMPAById (int id) {
+        return filmStorage.getMPAById(id);
     }
 
     /**
