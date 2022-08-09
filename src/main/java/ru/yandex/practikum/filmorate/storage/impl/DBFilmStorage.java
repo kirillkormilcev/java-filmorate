@@ -9,7 +9,6 @@ import org.springframework.stereotype.Repository;
 import ru.yandex.practikum.filmorate.exception.CustomSQLException;
 import ru.yandex.practikum.filmorate.model.film.Film;
 import ru.yandex.practikum.filmorate.model.film.Genre;
-import ru.yandex.practikum.filmorate.model.user.User;
 import ru.yandex.practikum.filmorate.storage.FilmStorage;
 import ru.yandex.practikum.filmorate.storage.GenreStorage;
 import ru.yandex.practikum.filmorate.storage.MPAStorage;
@@ -75,9 +74,6 @@ public class DBFilmStorage implements FilmStorage {
                 );
             }
         }
-        /*if (film.getMPA() != null) {
-            film.setMPA(getMPAById(film.getMPA().getId()));
-        }*/
         return film;
     }
 
@@ -106,7 +102,6 @@ public class DBFilmStorage implements FilmStorage {
                 );
             }
         }
-        /*film.setMPA(getMPAById(film.getMPA().getId()));*/
         return film;
     }
 
@@ -115,29 +110,6 @@ public class DBFilmStorage implements FilmStorage {
         String sql = "select FILM_ID from FILMS";
         return jdbcTemplate.queryForList(sql, Long.class);
     }
-
-    /*@Override
-    public List<MPA> getAllMPAs() {
-        String sqlSelect = "select MPA_RATING_ID, RATING_NAME, DESCRIPTION from MPA_RATINGS";
-        return jdbcTemplate.query(sqlSelect, (rs, rowNum) -> makeMPA(rs));
-    }*/
-
-    /*@Override
-    public MPA getMPAById(int id) {
-        String sqlSelect = "select MPA_RATING_ID, RATING_NAME, DESCRIPTION from MPA_RATINGS " +
-                "where MPA_RATING_ID = ?";
-        return jdbcTemplate.queryForObject(sqlSelect, (rs, rowNum) -> makeMPA(rs), id);
-    }*/
-
-    @Override
-    public Map<Long, Film> getFilms() {
-        return null;
-    } // заглушка реализации в памяти
-
-    @Override
-    public Map<Long, Set<User>> getLikeIds() {
-        return null;
-    } // заглушка реализации в памяти
 
     /**
      * создать объект фильма из бд
@@ -165,29 +137,4 @@ public class DBFilmStorage implements FilmStorage {
             throw new RuntimeException(e);
         }
     }
-
-    /**
-     * создать объект MPA рейтинга из бд
-     */
-    /*private MPA makeMPA(ResultSet rs) {
-        try {
-            return MPA.builder()
-                    .id(rs.getInt("MPA_RATING_ID"))
-                    .name(rs.getString("RATING_NAME"))
-                    .description(rs.getString("DESCRIPTION"))
-                    .build();
-        } catch (SQLException | RuntimeException e) {
-            throw new CustomSQLException("Ошибка при создании MPA рейтинга из строки БД." + "\n" +
-                    Arrays.toString(e.getStackTrace()), e.getCause());
-        }
-    }*/
-
-    /**
-     * список id жанров фильма по его id
-     */
-    /*private List<Integer> getGenreIdsByFilmId(long id) {
-        String sqlSelect = "select GENRE_ID from FILM_GENRES " +
-                "where FILM_ID = ?";
-        return jdbcTemplate.queryForList(sqlSelect, Integer.class, id);
-    }*/
 }
