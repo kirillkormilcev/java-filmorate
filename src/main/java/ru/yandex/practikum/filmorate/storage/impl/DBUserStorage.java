@@ -177,8 +177,9 @@ public class DBUserStorage implements UserStorage {
                     .birthday(rs.getDate("BIRTHDAY").toLocalDate())
                     .friendsCount(friendsCountByUserId(rs.getLong("USER_ID")))
                     .build();
-        } catch (SQLException | RuntimeException e) { // TODO правильный ли отлов ошибок
-            throw new CustomSQLException("Ошибка при создании пользователя из строки БД.");
+        } catch (SQLException | RuntimeException e) {
+            throw new CustomSQLException("Ошибка при создании пользователя из строки БД." + "\n" +
+                    Arrays.toString(e.getStackTrace()), e.getCause());
         }
     }
 

@@ -9,6 +9,7 @@ import ru.yandex.practikum.filmorate.model.film.Film;
 import ru.yandex.practikum.filmorate.model.film.MPA;
 import ru.yandex.practikum.filmorate.model.user.User;
 import ru.yandex.practikum.filmorate.storage.impl.DBFilmStorage;
+import ru.yandex.practikum.filmorate.storage.impl.DBLikeStorage;
 import ru.yandex.practikum.filmorate.storage.impl.DBUserStorage;
 
 import java.time.LocalDate;
@@ -24,6 +25,7 @@ class FilmorateApplicationTests {
 
     private final DBUserStorage userStorage;
     private final DBFilmStorage filmStorage;
+    private final DBLikeStorage likeStorage;
 
     User user1 = User.builder()
             .email("kirill@kormilcev.ru")
@@ -268,11 +270,11 @@ class FilmorateApplicationTests {
         userStorage.addUser(user6);
         userStorage.addUser(user7);
 
-        filmStorage.addLikeUserToFilm(film2.getId(), user6.getId());
-        filmStorage.addLikeUserToFilm(film2.getId(), user7.getId());
+        likeStorage.addLikeUserToFilm(film2.getId(), user6.getId());
+        likeStorage.addLikeUserToFilm(film2.getId(), user7.getId());
 
         filmStorage.addFilm(film3); // id=2
-        filmStorage.addLikeUserToFilm(film3.getId(), user6.getId());
+        likeStorage.addLikeUserToFilm(film3.getId(), user6.getId());
 
         filmStorage.addFilm(film4); // id=3
 
@@ -283,7 +285,7 @@ class FilmorateApplicationTests {
         assertEquals(0, filmStorage.getFilmById(film4.getId()).getLikesRating(),
                 "У film4 ожидается 0 лайков.");
 
-        filmStorage.removeLikeUserFromFilm(film2.getId(), user6.getId());
+        likeStorage.removeLikeUserFromFilm(film2.getId(), user6.getId());
         assertEquals(1, filmStorage.getFilmById(film2.getId()).getLikesRating(),
                 "У film2 ожидается 2 лайка.");
 

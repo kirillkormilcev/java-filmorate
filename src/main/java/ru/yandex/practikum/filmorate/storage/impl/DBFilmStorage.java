@@ -12,6 +12,7 @@ import ru.yandex.practikum.filmorate.model.film.Genre;
 import ru.yandex.practikum.filmorate.model.film.MPA;
 import ru.yandex.practikum.filmorate.model.user.User;
 import ru.yandex.practikum.filmorate.storage.FilmStorage;
+import ru.yandex.practikum.filmorate.storage.LikeStorage;
 
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -93,7 +94,7 @@ public class DBFilmStorage implements FilmStorage {
                 "where FILM_ID = ?";
         if (film.getGenres() != null) {
             jdbcTemplate.update(sqlDelete, film.getId());
-            sqlMerge = "insert into FILM_GENRES (FILM_ID, GENRE_ID) " + // todo нарушается принцип транзакции, но не придумал
+            sqlMerge = "insert into FILM_GENRES (FILM_ID, GENRE_ID) " +
                     "values (?, ?)";
             for (Genre genre : film.getGenres()) {
                 jdbcTemplate.update(sqlMerge,
@@ -102,26 +103,26 @@ public class DBFilmStorage implements FilmStorage {
                 );
             }
         }
-        updateFilmLikesRating(film.getId());
+        //likeStorage.updateFilmLikesRating(film.getId());
         film.setMPA(getMPAById(film.getMPA().getId()));
         return film;
     }
 
-    @Override
-    public void addLikeUserToFilm(long filmId, long userId) { // добавить метод обновления лайков в таблице фильмов
+    /*@Override
+    public void addLikeUserToFilm(long filmId, long userId) {
         String sqlInsert = "insert into LIKES (FILM_ID, USER_ID) " +
                 "values (?, ?)";
         jdbcTemplate.update(sqlInsert, filmId, userId);
         updateFilmLikesRating(filmId);
-    }
+    }*/
 
-    @Override
-    public void removeLikeUserFromFilm(long filmId, long userId) { // добавить метод обновления лайков в таблице фильмов
+    /*@Override
+    public void removeLikeUserFromFilm(long filmId, long userId) {
         String sqlDelete = "delete from LIKES " +
                 "where FILM_ID = ? and USER_ID = ?";
         jdbcTemplate.update(sqlDelete, filmId, userId);
         updateFilmLikesRating(filmId);
-    }
+    }*/
 
     @Override
     public List<Long> getAllFilmIds() {
@@ -185,7 +186,8 @@ public class DBFilmStorage implements FilmStorage {
                     .MPA(getMPAById(rs.getInt("MPA_RATING_ID")))
                     .build();
         } catch (RuntimeException e) { // TODO правильный ли отлов ошибок
-            throw new CustomSQLException("Ошибка при создании фильма из строки БД.");
+            throw new CustomSQLException("Ошибка при создании фильма из строки БД." + "\n" +
+                    Arrays.toString(e.getStackTrace()), e.getCause());
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -201,8 +203,9 @@ public class DBFilmStorage implements FilmStorage {
                     .name(rs.getString("GENRE_NAME"))
                     .description(rs.getString("DESCRIPTION"))
                     .build();
-        } catch (SQLException | RuntimeException e) { // TODO правильный ли отлов ошибок
-            throw new CustomSQLException("Ошибка при создании жанра из строки БД.");
+        } catch (SQLException | RuntimeException e) {
+            throw new CustomSQLException("Ошибка при создании жанра из строки БД." + "\n" +
+                    Arrays.toString(e.getStackTrace()), e.getCause());
         }
     }
 
@@ -216,8 +219,9 @@ public class DBFilmStorage implements FilmStorage {
                     .name(rs.getString("RATING_NAME"))
                     .description(rs.getString("DESCRIPTION"))
                     .build();
-        } catch (SQLException | RuntimeException e) { // TODO правильный ли отлов ошибок
-            throw new CustomSQLException("Ошибка при создании MPA рейтинга из строки БД.");
+        } catch (SQLException | RuntimeException e) {
+            throw new CustomSQLException("Ошибка при создании MPA рейтинга из строки БД." + "\n" +
+                    Arrays.toString(e.getStackTrace()), e.getCause());
         }
     }
 
@@ -233,14 +237,14 @@ public class DBFilmStorage implements FilmStorage {
     /**
      * обновить количество лайков у фильма
      */
-    private void updateFilmLikesRating(long id) {
+    /*private void updateFilmLikesRating(long id) {
         String sqlMerge = "merge into FILMS (FILM_ID, LIKES_RATING)" +
                 "values (?, ?)";
         jdbcTemplate.update(sqlMerge,
                 id,
                 likesCountByFilmId(id)
         );
-    }
+    }*/
 
     /**
      * количество лайков у фильма по его id

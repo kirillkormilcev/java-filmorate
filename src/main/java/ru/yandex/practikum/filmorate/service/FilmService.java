@@ -9,6 +9,7 @@ import ru.yandex.practikum.filmorate.model.film.Film;
 import ru.yandex.practikum.filmorate.model.film.Genre;
 import ru.yandex.practikum.filmorate.model.film.MPA;
 import ru.yandex.practikum.filmorate.storage.FilmStorage;
+import ru.yandex.practikum.filmorate.storage.LikeStorage;
 import ru.yandex.practikum.filmorate.storage.UserStorage;
 
 import java.time.LocalDate;
@@ -21,11 +22,13 @@ public class FilmService {
     @Getter //для Junit тестов
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
+    private final LikeStorage likeStorage;
 
     @Autowired
-    public FilmService(@Qualifier FilmStorage filmStorage, @Qualifier UserStorage userStorage) {
+    public FilmService(@Qualifier FilmStorage filmStorage, @Qualifier UserStorage userStorage, LikeStorage likeStorage) {
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
+        this.likeStorage = likeStorage;
     }
 
     /**
@@ -59,6 +62,7 @@ public class FilmService {
         checkFilmId(film.getId());
         filmValidation(film);
         filmStorage.updateFilm(film);
+        likeStorage.updateFilmLikesRating(film.getId());
         return film;
     }
 
@@ -70,7 +74,7 @@ public class FilmService {
         if (!userStorage.getAllUserIds().contains(userId)) {
             throw new NotFoundException("Пользователя с индексом: " + userId + " нет в базе пользователей.");
         }
-        filmStorage.addLikeUserToFilm(filmId, userId); /* добавить лайкнувшего пользователя к фильму */
+        likeStorage.addLikeUserToFilm(filmId, userId); /* добавить лайкнувшего пользователя к фильму */
         return filmStorage.getFilmById(filmId);
     }
 
@@ -82,7 +86,7 @@ public class FilmService {
         if (!userStorage.getAllUserIds().contains(userId)) {
             throw new NotFoundException("Пользователя с индексом: " + userId + " нет в базе пользователей.");
         }
-        filmStorage.removeLikeUserFromFilm(filmId, userId); /* удалить лайкнувшего пользователя у фильма */
+        likeStorage.removeLikeUserFromFilm(filmId, userId); /* удалить лайкнувшего пользователя у фильма */
         return filmStorage.getFilmById(filmId);
     }
 

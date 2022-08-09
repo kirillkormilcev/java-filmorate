@@ -50,18 +50,18 @@ public class InMemoryFilmStorage implements FilmStorage {
         return film;
     }
 
-    @Override
+    /*@Override
     public void addLikeUserToFilm(long filmId, long userId) {
-        if (!likeIds.containsKey(filmId)) { /* если множество лайкнувших пользователей еще не создано */
-            likeIds.put(filmId, new HashSet<>()); /* то создаем */
+        if (!likeIds.containsKey(filmId)) { *//* если множество лайкнувших пользователей еще не создано *//*
+            likeIds.put(filmId, new HashSet<>()); *//* то создаем *//*
         }
         likeIds.get(filmId).add(userStorage.getUsers().get(userId));
-    }
+    }*/
 
-    @Override
+    /*@Override
     public void removeLikeUserFromFilm(long filmId, long userId) {
         likeIds.get(filmId).remove(userStorage.getUsers().get(userId));
-    }
+    }*/
 
     @Override
     public List<Long> getAllFilmIds() {

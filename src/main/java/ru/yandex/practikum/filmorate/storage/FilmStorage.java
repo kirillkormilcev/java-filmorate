@@ -32,12 +32,12 @@ public interface FilmStorage {
     /**
      * добавить лайк
      */
-    void addLikeUserToFilm(long filmId, long userId);
+    /*void addLikeUserToFilm(long filmId, long userId);*/
 
     /**
      * удалить лайк
      */
-    void removeLikeUserFromFilm(long filmId, long userId);
+    /*void removeLikeUserFromFilm(long filmId, long userId);*/
 
     /**
      * список id всех фильмов
