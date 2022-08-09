@@ -50,28 +50,15 @@ public class InMemoryFilmStorage implements FilmStorage {
         return film;
     }
 
-    /*@Override
-    public void addLikeUserToFilm(long filmId, long userId) {
-        if (!likeIds.containsKey(filmId)) { *//* если множество лайкнувших пользователей еще не создано *//*
-            likeIds.put(filmId, new HashSet<>()); *//* то создаем *//*
-        }
-        likeIds.get(filmId).add(userStorage.getUsers().get(userId));
-    }*/
-
-    /*@Override
-    public void removeLikeUserFromFilm(long filmId, long userId) {
-        likeIds.get(filmId).remove(userStorage.getUsers().get(userId));
-    }*/
-
     @Override
     public List<Long> getAllFilmIds() {
         return null;
     } // заглушка реализации в БД
 
-    @Override
+   /* @Override
     public Genre getGenreById(int id) {
         return null;
-    } // заглушка реализации в БД
+    }*/ // заглушка реализации в БД
 
     @Override
     public List<MPA> getAllMPAs() {
@@ -83,8 +70,8 @@ public class InMemoryFilmStorage implements FilmStorage {
         return null;
     } // заглушка реализации в БД
 
-    @Override
+   /* @Override
     public List<Genre> getAllGenres() {
         return null;
-    } // заглушка реализации в БД
+    }*/ // заглушка реализации в БД
 }

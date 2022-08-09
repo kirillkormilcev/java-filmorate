@@ -9,6 +9,7 @@ import ru.yandex.practikum.filmorate.model.film.Film;
 import ru.yandex.practikum.filmorate.model.film.MPA;
 import ru.yandex.practikum.filmorate.model.user.User;
 import ru.yandex.practikum.filmorate.storage.impl.DBFilmStorage;
+import ru.yandex.practikum.filmorate.storage.impl.DBGenreStorage;
 import ru.yandex.practikum.filmorate.storage.impl.DBLikeStorage;
 import ru.yandex.practikum.filmorate.storage.impl.DBUserStorage;
 
@@ -26,6 +27,7 @@ class FilmorateApplicationTests {
     private final DBUserStorage userStorage;
     private final DBFilmStorage filmStorage;
     private final DBLikeStorage likeStorage;
+    private final DBGenreStorage genreStorage;
 
     User user1 = User.builder()
             .email("kirill@kormilcev.ru")
@@ -292,7 +294,7 @@ class FilmorateApplicationTests {
         assertArrayEquals(new Long[]{1L, 2L, 3L}, filmStorage.getAllFilmIds().stream().sorted().toArray(),
                 "Ожидаются фильмы в базе 1, 2, 3, 4");
 
-        assertEquals("Комедия", filmStorage.getGenreById(1).getName(),
+        assertEquals("Комедия", genreStorage.getGenreById(1).getName(),
                 "Под 1 индексом ожидается Комедия");
 
         assertEquals(5, filmStorage.getAllMPAs().size(),
@@ -301,8 +303,8 @@ class FilmorateApplicationTests {
         assertEquals("G", filmStorage.getMPAById(1).getName(),
                 "Под 1 индексом ожидается G");
 
-        assertEquals(6, filmStorage.getAllGenres().size(),
-                "Список жарнов ожидается размером 6.");
+        assertEquals(6, genreStorage.getAllGenres().size(),
+                "Список жанров ожидается размером 6.");
 
     }
 }

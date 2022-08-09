@@ -113,19 +113,19 @@ public class FilmService {
     /**
      * список всех жанров
      */
-    public List<Genre> getAllGenres() {
+    /*public List<Genre> getAllGenres() {
         return filmStorage.getAllGenres();
-    }
+    }*/
 
     /**
      * жанр по id
      */
-    public Genre getGenreById(int id) {
+    /*public Genre getGenreById(int id) {
         if (id <= 0) {
             throw new GenreValidationException("Значение индекса жанра передано меньше или равно 0.");
         }
         return filmStorage.getGenreById(id);
-    }
+    }*/
 
     /**
      * список всех MPA рейтингов

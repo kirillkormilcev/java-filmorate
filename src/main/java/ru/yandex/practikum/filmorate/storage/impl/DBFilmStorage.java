@@ -12,7 +12,7 @@ import ru.yandex.practikum.filmorate.model.film.Genre;
 import ru.yandex.practikum.filmorate.model.film.MPA;
 import ru.yandex.practikum.filmorate.model.user.User;
 import ru.yandex.practikum.filmorate.storage.FilmStorage;
-import ru.yandex.practikum.filmorate.storage.LikeStorage;
+import ru.yandex.practikum.filmorate.storage.GenreStorage;
 
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -26,6 +26,7 @@ import java.util.*;
 public class DBFilmStorage implements FilmStorage {
 
     private final JdbcTemplate jdbcTemplate;
+    private final GenreStorage genreStorage; //todo заинжектил, не придумал как обойтись без метода getGenreById
 
     @Override
     public List<Film> getListOfFilms() {
@@ -103,26 +104,9 @@ public class DBFilmStorage implements FilmStorage {
                 );
             }
         }
-        //likeStorage.updateFilmLikesRating(film.getId());
         film.setMPA(getMPAById(film.getMPA().getId()));
         return film;
     }
-
-    /*@Override
-    public void addLikeUserToFilm(long filmId, long userId) {
-        String sqlInsert = "insert into LIKES (FILM_ID, USER_ID) " +
-                "values (?, ?)";
-        jdbcTemplate.update(sqlInsert, filmId, userId);
-        updateFilmLikesRating(filmId);
-    }*/
-
-    /*@Override
-    public void removeLikeUserFromFilm(long filmId, long userId) {
-        String sqlDelete = "delete from LIKES " +
-                "where FILM_ID = ? and USER_ID = ?";
-        jdbcTemplate.update(sqlDelete, filmId, userId);
-        updateFilmLikesRating(filmId);
-    }*/
 
     @Override
     public List<Long> getAllFilmIds() {
@@ -130,12 +114,12 @@ public class DBFilmStorage implements FilmStorage {
         return jdbcTemplate.queryForList(sql, Long.class);
     }
 
-    @Override
+    /*@Override
     public Genre getGenreById(int id) {
         String sqlSelect = "select GENRE_ID, GENRE_NAME, DESCRIPTION from GENRES " +
                 "where GENRE_ID = ?";
         return jdbcTemplate.queryForObject(sqlSelect, (rs, rowNum) -> makeGenre(rs), id);
-    }
+    }*/
 
     @Override
     public List<MPA> getAllMPAs() {
@@ -150,11 +134,11 @@ public class DBFilmStorage implements FilmStorage {
         return jdbcTemplate.queryForObject(sqlSelect, (rs, rowNum) -> makeMPA(rs), id);
     }
 
-    @Override
+    /*@Override
     public List<Genre> getAllGenres() {
         String sqlSelect = "select GENRE_ID, GENRE_NAME, DESCRIPTION from GENRES";
         return jdbcTemplate.query(sqlSelect, (rs, rowNum) -> makeGenre(rs));
-    }
+    }*/
 
     @Override
     public Map<Long, Film> getFilms() {
@@ -180,12 +164,12 @@ public class DBFilmStorage implements FilmStorage {
                     .likesRating(rs.getInt("LIKES_RATING"))
                     .genres(new HashSet<>() {{
                         for (Integer genreId : getGenreIdsByFilmId(rs.getInt("FILM_ID"))) {
-                            add(getGenreById(genreId));
+                            add(genreStorage.getGenreById(genreId));
                         }
                     }})
                     .MPA(getMPAById(rs.getInt("MPA_RATING_ID")))
                     .build();
-        } catch (RuntimeException e) { // TODO правильный ли отлов ошибок
+        } catch (RuntimeException e) {
             throw new CustomSQLException("Ошибка при создании фильма из строки БД." + "\n" +
                     Arrays.toString(e.getStackTrace()), e.getCause());
         } catch (SQLException e) {
@@ -196,7 +180,7 @@ public class DBFilmStorage implements FilmStorage {
     /**
      * создать объект жанра из бд
      */
-    private Genre makeGenre(ResultSet rs) {
+    /*private Genre makeGenre(ResultSet rs) {
         try {
             return Genre.builder()
                     .id(rs.getInt("GENRE_ID"))
@@ -207,7 +191,7 @@ public class DBFilmStorage implements FilmStorage {
             throw new CustomSQLException("Ошибка при создании жанра из строки БД." + "\n" +
                     Arrays.toString(e.getStackTrace()), e.getCause());
         }
-    }
+    }*/
 
     /**
      * создать объект MPA рейтинга из бд
@@ -232,26 +216,5 @@ public class DBFilmStorage implements FilmStorage {
         String sqlSelect = "select GENRE_ID from FILM_GENRES " +
                 "where FILM_ID = ?";
         return jdbcTemplate.queryForList(sqlSelect, Integer.class, id);
-    }
-
-    /**
-     * обновить количество лайков у фильма
-     */
-    /*private void updateFilmLikesRating(long id) {
-        String sqlMerge = "merge into FILMS (FILM_ID, LIKES_RATING)" +
-                "values (?, ?)";
-        jdbcTemplate.update(sqlMerge,
-                id,
-                likesCountByFilmId(id)
-        );
-    }*/
-
-    /**
-     * количество лайков у фильма по его id
-     */
-    private long likesCountByFilmId(long id) {
-        String sqlSelect = "select count(USER_ID) from LIKES " +
-                "where FILM_ID = ?";
-        return Objects.requireNonNullElse(jdbcTemplate.queryForObject(sqlSelect, long.class, id), 0L);
     }
 }

@@ -30,16 +30,6 @@ public interface FilmStorage {
     Film updateFilm(Film film);
 
     /**
-     * добавить лайк
-     */
-    /*void addLikeUserToFilm(long filmId, long userId);*/
-
-    /**
-     * удалить лайк
-     */
-    /*void removeLikeUserFromFilm(long filmId, long userId);*/
-
-    /**
      * список id всех фильмов
      */
     List<Long> getAllFilmIds();
@@ -47,7 +37,7 @@ public interface FilmStorage {
     /**
      * получить жанр по id
      */
-    Genre getGenreById(int id);
+    /*Genre getGenreById(int id);*/
 
     /**
      * получить все MPA рейтинги
@@ -62,7 +52,7 @@ public interface FilmStorage {
     /**
      * получить все жанры
      */
-    List<Genre> getAllGenres();
+    /*List<Genre> getAllGenres();*/
 
     /**
      * геттер мапы фильмов

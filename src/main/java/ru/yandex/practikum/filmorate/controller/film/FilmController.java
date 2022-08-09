@@ -9,6 +9,7 @@ import ru.yandex.practikum.filmorate.model.film.Film;
 import ru.yandex.practikum.filmorate.model.film.Genre;
 import ru.yandex.practikum.filmorate.model.film.MPA;
 import ru.yandex.practikum.filmorate.service.FilmService;
+import ru.yandex.practikum.filmorate.storage.GenreStorage;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -17,10 +18,12 @@ import java.util.List;
 @Slf4j
 public class FilmController {
     private final FilmService filmService;
+    private final GenreStorage genreStorage;
 
     @Autowired
-    public FilmController(FilmService filmService) {
+    public FilmController(FilmService filmService, GenreStorage genreStorage) {
         this.filmService = filmService;
+        this.genreStorage = genreStorage;
     }
 
     @GetMapping("/films")
@@ -69,13 +72,13 @@ public class FilmController {
     @GetMapping("/genres")
     public ResponseEntity<List<Genre>> getAllGenres() {
         log.info("Обработка эндпойнта GET /genres");
-        return new ResponseEntity<>(filmService.getAllGenres(), HttpStatus.OK);
+        return new ResponseEntity<>(genreStorage.getAllGenres(), HttpStatus.OK);
     }
 
     @GetMapping("/genres/{genreId}")
-    public ResponseEntity<Genre> getAllGenres(@PathVariable int genreId) {
+    public ResponseEntity<Genre> getGenreById(@PathVariable int genreId) {
         log.info("Обработка эндпойнта GET /genres/{}", genreId);
-        return new ResponseEntity<>(filmService.getGenreById(genreId), HttpStatus.OK);
+        return new ResponseEntity<>(genreStorage.getGenreById(genreId), HttpStatus.OK);
     }
 
     @GetMapping("/mpa")

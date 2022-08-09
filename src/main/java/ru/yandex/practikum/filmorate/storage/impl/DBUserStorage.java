@@ -243,6 +243,5 @@ public class DBUserStorage implements UserStorage {
                 id,
                 friendsCountByUserId(id)
         );
-
     }
 }
