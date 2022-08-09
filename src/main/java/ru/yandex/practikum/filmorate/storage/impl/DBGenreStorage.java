@@ -36,6 +36,13 @@ public class DBGenreStorage implements GenreStorage {
         return jdbcTemplate.query(sqlSelect, (rs, rowNum) -> makeGenre(rs));
     }
 
+    @Override
+    public List<Integer> getGenreIdsByFilmId(long id) {
+        String sqlSelect = "select GENRE_ID from FILM_GENRES " +
+                "where FILM_ID = ?";
+        return jdbcTemplate.queryForList(sqlSelect, Integer.class, id);
+    }
+
     /**
      * создать объект жанра из бд
      */
@@ -51,4 +58,5 @@ public class DBGenreStorage implements GenreStorage {
                     Arrays.toString(e.getStackTrace()), e.getCause());
         }
     }
+
 }

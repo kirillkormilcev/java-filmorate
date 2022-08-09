@@ -8,10 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practikum.filmorate.model.film.Film;
 import ru.yandex.practikum.filmorate.model.film.MPA;
 import ru.yandex.practikum.filmorate.model.user.User;
-import ru.yandex.practikum.filmorate.storage.impl.DBFilmStorage;
-import ru.yandex.practikum.filmorate.storage.impl.DBGenreStorage;
-import ru.yandex.practikum.filmorate.storage.impl.DBLikeStorage;
-import ru.yandex.practikum.filmorate.storage.impl.DBUserStorage;
+import ru.yandex.practikum.filmorate.storage.impl.*;
 
 import java.time.LocalDate;
 
@@ -28,6 +25,7 @@ class FilmorateApplicationTests {
     private final DBFilmStorage filmStorage;
     private final DBLikeStorage likeStorage;
     private final DBGenreStorage genreStorage;
+    private final DBMPAStorage mpaStorage;
 
     User user1 = User.builder()
             .email("kirill@kormilcev.ru")
@@ -297,10 +295,10 @@ class FilmorateApplicationTests {
         assertEquals("Комедия", genreStorage.getGenreById(1).getName(),
                 "Под 1 индексом ожидается Комедия");
 
-        assertEquals(5, filmStorage.getAllMPAs().size(),
+        assertEquals(5, mpaStorage.getAllMPAs().size(),
                 "Список MPA ожидается размером 5.");
 
-        assertEquals("G", filmStorage.getMPAById(1).getName(),
+        assertEquals("G", mpaStorage.getMPAById(1).getName(),
                 "Под 1 индексом ожидается G");
 
         assertEquals(6, genreStorage.getAllGenres().size(),

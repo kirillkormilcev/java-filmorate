@@ -6,10 +6,10 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practikum.filmorate.exception.*;
 import ru.yandex.practikum.filmorate.model.film.Film;
-import ru.yandex.practikum.filmorate.model.film.Genre;
 import ru.yandex.practikum.filmorate.model.film.MPA;
 import ru.yandex.practikum.filmorate.storage.FilmStorage;
 import ru.yandex.practikum.filmorate.storage.LikeStorage;
+import ru.yandex.practikum.filmorate.storage.MPAStorage;
 import ru.yandex.practikum.filmorate.storage.UserStorage;
 
 import java.time.LocalDate;
@@ -23,12 +23,15 @@ public class FilmService {
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
     private final LikeStorage likeStorage;
+    private final MPAStorage mpaStorage;
 
     @Autowired
-    public FilmService(@Qualifier FilmStorage filmStorage, @Qualifier UserStorage userStorage, LikeStorage likeStorage) {
+    public FilmService(@Qualifier FilmStorage filmStorage, @Qualifier UserStorage userStorage,
+                       LikeStorage likeStorage, MPAStorage mpaStorage) {
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
         this.likeStorage = likeStorage;
+        this.mpaStorage = mpaStorage;
     }
 
     /**
@@ -52,6 +55,9 @@ public class FilmService {
     public Film addFilmToStorage(Film film) {
         filmValidation(film);
         filmStorage.addFilm(film);
+        if (film.getMPA() != null) {
+            film.setMPA(getMPAById(film.getMPA().getId()));
+        }
         return film;
     }
 
@@ -63,6 +69,7 @@ public class FilmService {
         filmValidation(film);
         filmStorage.updateFilm(film);
         likeStorage.updateFilmLikesRating(film.getId());
+        film.setMPA(getMPAById(film.getMPA().getId()));
         return film;
     }
 
@@ -111,27 +118,10 @@ public class FilmService {
     }
 
     /**
-     * список всех жанров
-     */
-    /*public List<Genre> getAllGenres() {
-        return filmStorage.getAllGenres();
-    }*/
-
-    /**
-     * жанр по id
-     */
-    /*public Genre getGenreById(int id) {
-        if (id <= 0) {
-            throw new GenreValidationException("Значение индекса жанра передано меньше или равно 0.");
-        }
-        return filmStorage.getGenreById(id);
-    }*/
-
-    /**
      * список всех MPA рейтингов
      */
     public List<MPA> getAllMPAs() {
-        return filmStorage.getAllMPAs();
+        return mpaStorage.getAllMPAs();
     }
 
     /**
@@ -141,7 +131,7 @@ public class FilmService {
         if (id <= 0) {
             throw new MPAValidationException("Значение индекса рейтинга MPA передано меньше или равно 0.");
         }
-        return filmStorage.getMPAById(id);
+        return mpaStorage.getMPAById(id);
     }
 
     /**

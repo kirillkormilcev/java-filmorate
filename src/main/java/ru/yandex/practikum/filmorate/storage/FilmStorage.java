@@ -35,24 +35,14 @@ public interface FilmStorage {
     List<Long> getAllFilmIds();
 
     /**
-     * получить жанр по id
-     */
-    /*Genre getGenreById(int id);*/
-
-    /**
      * получить все MPA рейтинги
      */
-    List<MPA> getAllMPAs();
+    /*List<MPA> getAllMPAs();*/
 
     /**
      * получить MPA рейтинг по id
      */
-    MPA getMPAById(int id);
-
-    /**
-     * получить все жанры
-     */
-    /*List<Genre> getAllGenres();*/
+    /*MPA getMPAById(int id);*/
 
     /**
      * геттер мапы фильмов

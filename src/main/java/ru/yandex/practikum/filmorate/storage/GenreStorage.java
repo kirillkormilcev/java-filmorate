@@ -15,4 +15,9 @@ public interface GenreStorage {
      * получить все жанры
      */
     List<Genre> getAllGenres();
+
+    /**
+     * список id жанров фильма по его id
+     */
+    List<Integer> getGenreIdsByFilmId(long id);
 }

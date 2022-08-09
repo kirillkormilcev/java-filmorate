@@ -55,23 +55,13 @@ public class InMemoryFilmStorage implements FilmStorage {
         return null;
     } // заглушка реализации в БД
 
-   /* @Override
-    public Genre getGenreById(int id) {
-        return null;
-    }*/ // заглушка реализации в БД
-
-    @Override
+    /*@Override
     public List<MPA> getAllMPAs() {
         return null;
-    } // заглушка реализации в БД
+    }*/ // заглушка реализации в БД
 
-    @Override
+    /*@Override
     public MPA getMPAById(int id) {
         return null;
-    } // заглушка реализации в БД
-
-   /* @Override
-    public List<Genre> getAllGenres() {
-        return null;
-    }*/ // заглушка реализации в БД
+    } */// заглушка реализации в БД
 }
