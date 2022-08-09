@@ -290,7 +290,7 @@ class FilmorateApplicationTests {
         assertArrayEquals(new Long[]{1L, 2L, 3L}, filmStorage.getAllFilmIds().stream().sorted().toArray(),
                 "Ожидаются фильмы в базе 1, 2, 3, 4");
 
-        assertEquals("РљРѕРјРµРґРёСЏ", filmStorage.getGenreById(1).getName(),
+        assertEquals("Комедия", filmStorage.getGenreById(1).getName(),
                 "Под 1 индексом ожидается Комедия");
 
         assertEquals(5, filmStorage.getAllMPAs().size(),
