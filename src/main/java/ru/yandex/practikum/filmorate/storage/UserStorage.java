@@ -46,7 +46,7 @@ public interface UserStorage {
     /**
      * геттер мапы друзей пользователя
      */
-    Set<User> getUserFriendIds(long id);
+    Set<User> getUserFriends(long id);
 
     /**
      * геттер мапы пролайканых фильмов пользователя

@@ -93,7 +93,7 @@ public class UserService {
      */
     public Set<User> getFriendsByUserId(long userId) {
         checkUserId(userId);
-        return userStorage.getUserFriendIds(userId);
+        return userStorage.getUserFriends(userId);
     }
 
     /**

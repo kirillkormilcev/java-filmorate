@@ -137,7 +137,7 @@ public class DBUserStorage implements UserStorage {
     }
 
     @Override
-    public Set<User> getUserFriendIds(long id) {
+    public Set<User> getUserFriends(long id) {
         String sqlSelect = "select FRIEND2_ID from FRIENDSHIPS " +
                 "where USER1_ID = ?";
         Set<Long> userFriendsIds = new HashSet<>(jdbcTemplate.queryForList(sqlSelect, Long.class, id));
@@ -145,8 +145,6 @@ public class DBUserStorage implements UserStorage {
         for (Long friendId : userFriendsIds) {
             userFriends.add(getUserById(friendId));
         }
-        /*return jdbcTemplate.queryForStream(sqlSelect, (rs, rowNum) -> getUserById(rs.getLong("FRIEND2_ID")), id)
-                .collect(Collectors.toSet());*/
         return userFriends;
     }
 

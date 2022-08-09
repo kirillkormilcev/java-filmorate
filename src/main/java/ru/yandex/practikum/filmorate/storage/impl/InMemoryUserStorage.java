@@ -54,7 +54,7 @@ public class InMemoryUserStorage implements UserStorage {
     } /* заглушка реализации БД */
 
     @Override
-    public Set<User> getUserFriendIds(long id) {
+    public Set<User> getUserFriends(long id) {
         return null;
     } /* заглушка реализации БД */
 
