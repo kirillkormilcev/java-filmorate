@@ -30,5 +30,10 @@ public interface FilmStorage {
      * список id всех фильмов
      */
     List<Long> getAllFilmIds();
+
+    /**
+     * список id жанров фильма по его id
+     */
+    List<Integer> getGenreIdsByFilmId(long id);
 }
 

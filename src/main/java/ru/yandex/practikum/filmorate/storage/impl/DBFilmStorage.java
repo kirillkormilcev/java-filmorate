@@ -111,6 +111,13 @@ public class DBFilmStorage implements FilmStorage {
         return jdbcTemplate.queryForList(sql, Long.class);
     }
 
+    @Override
+    public List<Integer> getGenreIdsByFilmId(long id) {
+        String sqlSelect = "select GENRE_ID from FILM_GENRES " +
+                "where FILM_ID = ?";
+        return jdbcTemplate.queryForList(sqlSelect, Integer.class, id);
+    }
+
     /**
      * создать объект фильма из бд
      */
@@ -124,7 +131,7 @@ public class DBFilmStorage implements FilmStorage {
                     .duration(rs.getInt("DURATION"))
                     .likesRating(rs.getInt("LIKES_RATING"))
                     .genres(new HashSet<>() {{
-                        for (Integer genreId : genreStorage.getGenreIdsByFilmId(rs.getInt("FILM_ID"))) {
+                        for (Integer genreId : getGenreIdsByFilmId(rs.getInt("FILM_ID"))) {
                             add(genreStorage.getGenreById(genreId));
                         }
                     }})

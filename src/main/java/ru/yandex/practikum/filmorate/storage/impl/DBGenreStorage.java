@@ -1,7 +1,6 @@
 package ru.yandex.practikum.filmorate.storage.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practikum.filmorate.exception.CustomSQLException;
@@ -34,13 +33,6 @@ public class DBGenreStorage implements GenreStorage {
     public List<Genre> getAllGenres() {
         String sqlSelect = "select GENRE_ID, GENRE_NAME, DESCRIPTION from GENRES";
         return jdbcTemplate.query(sqlSelect, (rs, rowNum) -> makeGenre(rs));
-    }
-
-    @Override
-    public List<Integer> getGenreIdsByFilmId(long id) {
-        String sqlSelect = "select GENRE_ID from FILM_GENRES " +
-                "where FILM_ID = ?";
-        return jdbcTemplate.queryForList(sqlSelect, Integer.class, id);
     }
 
     /**
