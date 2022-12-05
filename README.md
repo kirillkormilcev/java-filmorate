@@ -1,5 +1,6 @@
 # java-filmorate
-Template repository for Filmorate project.
+
+## Аналог кинопоиска (учебный)
 
 Диаграмма базы данных:
 
